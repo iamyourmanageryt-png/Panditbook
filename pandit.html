@@ -42,15 +42,15 @@
           <input type="text" id="p-name" placeholder="e.g. Acharya Ramakant Mishra" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-3 text-white outline-none focus:ring-2 focus:ring-amber-500 font-semibold" />
         </div>
         <div>
-          <label class="font-bold text-slate-300">Mobile Phone (for Audio alerts & Devotee calls)</label>
+          <label class="font-bold text-slate-300">Mobile Phone</label>
           <input type="tel" id="p-phone" placeholder="e.g. +91 9123456780" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-3 text-white outline-none focus:ring-2 focus:ring-amber-500 font-semibold" />
         </div>
         <div>
-          <label class="font-bold text-slate-300">Email Address</label>
+          <label class="font-bold text-slate-300">Email Address (or Username)</label>
           <input type="email" id="p-email" placeholder="purohit@ranchi.com" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-3 text-white outline-none focus:ring-2 focus:ring-amber-500 font-semibold" />
         </div>
         <div>
-          <label class="font-bold text-slate-300">Password</label>
+          <label class="font-bold text-slate-300">Password / PIN</label>
           <input type="password" id="p-pass" placeholder="••••••••" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-3 text-white outline-none focus:ring-2 focus:ring-amber-500" />
         </div>
 
@@ -68,8 +68,8 @@
         <div>
           <h2 id="dash-pandit-name" class="font-black text-xl text-white">Acharya Ramakant Mishra</h2>
           <p id="dash-pandit-meta" class="text-xs text-slate-400">Ranchi Zone Purohit • Rating ★ 5.0</p>
-          <span id="dash-kyc-badge" class="inline-block mt-2 text-[10px] font-black uppercase px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
-            KYC Status: Pending Verification
+          <span id="dash-kyc-badge" class="inline-block mt-2 text-[10px] font-black uppercase px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            KYC Status: Verified Scholar ✓
           </span>
         </div>
 
@@ -154,7 +154,6 @@
       db,
       auth,
       DEFAULT_SERVICES,
-      sounds,
       showToast,
       showCustomModal,
       doc,
@@ -176,7 +175,6 @@
     let currentPanditId = null;
     let panditProfile = null;
 
-    // Render Rates Inputs
     function renderCustomRates(savedRates = {}) {
       const container = document.getElementById("pandit-rates-container");
       container.innerHTML = "";
@@ -198,7 +196,6 @@
       });
     }
 
-    // Save Bank Details
     document.getElementById("btn-save-bank").onclick = async () => {
       const holder = document.getElementById("bank-holder-name").value.trim();
       const bankName = document.getElementById("bank-name").value.trim();
@@ -217,7 +214,6 @@
       }
     };
 
-    // Save Custom Rates
     document.getElementById("btn-save-custom-rates").onclick = async () => {
       const inputs = document.querySelectorAll(".pandit-rate-input");
       const rates = {};
@@ -228,14 +224,12 @@
       showToast("Custom Dakshina rates updated!", "success");
     };
 
-    // Toggle Online
     document.getElementById("btn-toggle-online").onclick = async () => {
       if (!panditProfile) return;
       const next = panditProfile.status === "online" ? "offline" : "online";
       await updateDoc(doc(db, "pandits", currentPanditId), { status: next });
     };
 
-    // Listen For Confirmed Bookings Assigned to This Purohit
     function listenAssignedBookings(panditId) {
       const q = query(
         collection(db, "bookings"),
@@ -288,7 +282,6 @@
       });
     }
 
-    // Auth Handling
     document.getElementById("btn-pandit-login").onclick = async () => {
       const email = document.getElementById("p-email").value.trim();
       const pass = document.getElementById("p-pass").value.trim();
@@ -296,7 +289,7 @@
       const phone = document.getElementById("p-phone").value.trim();
 
       if (!email || !pass) {
-        showToast("Please provide Email & Password", "error");
+        showToast("Please provide Email & Password/PIN", "error");
         return;
       }
 
@@ -304,21 +297,26 @@
         await signInWithEmailAndPassword(auth, email, pass);
         showToast("Signed in successfully!", "success");
       } catch (e) {
-        const res = await createUserWithEmailAndPassword(auth, email, pass);
-        await setDoc(doc(db, "pandits", res.user.uid), {
-          name: name || "Acharya Purohit",
-          phone: phone || "+91 9123456780",
-          email,
-          isVerified: false,
-          status: "online",
-          servicesOffered: ["griha_pravesh", "satyanarayan_katha", "rudrabhishek", "marriage", "navgrah_shanti", "mahamrityunjaya"],
-          languages: ["Hindi", "Sanskrit"],
-          location: new GeoPoint(23.3441, 85.3096),
-          rating: 5.0,
-          customRates: {},
-          createdAt: serverTimestamp()
-        });
-        showToast("Purohit Account Registered!", "success");
+        try {
+          const res = await createUserWithEmailAndPassword(auth, email, pass);
+          await setDoc(doc(db, "pandits", res.user.uid), {
+            name: name || "Acharya Purohit",
+            phone: phone || "+91 9123456780",
+            email,
+            isVerified: true,
+            status: "online",
+            servicesOffered: ["griha_pravesh", "satyanarayan_katha", "rudrabhishek", "marriage", "navgrah_shanti", "mahamrityunjaya"],
+            languages: ["Hindi", "Sanskrit"],
+            location: new GeoPoint(23.3441, 85.3096),
+            rating: 5.0,
+            experienceYears: 10,
+            customRates: {},
+            createdAt: serverTimestamp()
+          });
+          showToast("Purohit Account Registered & Activated!", "success");
+        } catch (createErr) {
+          showToast(createErr.message, "error");
+        }
       }
     };
 
