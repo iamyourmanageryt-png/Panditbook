@@ -280,10 +280,10 @@
               <span class="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-slate-200 bg-slate-50 text-slate-500 font-bold text-xs">+91</span>
               <input type="tel" id="phone-auth-number" placeholder="9876543210" maxlength="10" class="w-full border border-slate-200 rounded-r-xl p-2.5 outline-none focus:ring-2 focus:ring-orange-500 font-mono font-bold text-sm tracking-wider" />
             </div>
-            <p class="text-[10px] text-slate-400 mt-1">A 6-digit SMS verification code will be sent to this number.</p>
+            <p class="text-[10px] text-slate-400 mt-1">For testing without SMS quotas, add test number in Firebase Console.</p>
           </div>
 
-          <!-- Recaptcha Container (Required for Firebase Phone Auth) -->
+          <!-- Recaptcha Container -->
           <div id="recaptcha-container" class="flex justify-center my-2"></div>
 
           <button id="btn-send-otp" class="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 text-white font-black py-3 rounded-xl shadow-md transition flex items-center justify-center gap-1.5">
@@ -319,7 +319,7 @@
 
       <!-- METHOD 2: EMAIL & PASSWORD AUTH FLOW -->
       <div id="auth-view-email" class="hidden space-y-3 text-xs">
-        <div id="email-name-box">
+        <div>
           <label class="font-bold text-slate-600">Full Name</label>
           <input type="text" id="email-auth-name" placeholder="e.g. Amitabh Verma" class="w-full mt-1 border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-orange-500 font-medium" />
         </div>
@@ -344,11 +344,11 @@
         </button>
       </div>
 
-      <!-- Quick Guest Access -->
+      <!-- Quick 1-Click Guest Access -->
       <div class="pt-2 border-t border-slate-100">
         <button id="btn-auth-anonymous" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-xl transition text-[11px] flex items-center justify-center gap-1">
           <i class="fa-solid fa-user-clock text-slate-500"></i>
-          <span>Instant Guest Devotee Access</span>
+          <span>Instant 1-Click Guest Access</span>
         </button>
       </div>
     </div>
@@ -375,7 +375,6 @@
       auth,
       DEFAULT_SERVICES,
       RANCHI_CENTER,
-      sounds,
       showToast,
       showCustomModal,
       getPlatformSettings,
@@ -407,7 +406,6 @@
     let platformSettings = null;
     let map, mapMarker;
 
-    // Phone Auth Confirmation Result holder
     let confirmationResultObj = null;
     let resendTimerInterval = null;
 
@@ -687,7 +685,6 @@
           createdAt: serverTimestamp()
         });
 
-        sounds.playSuccess();
         showCustomModal({
           title: "Puja Booking Submitted!",
           message: `Booking #${newBooking.id.slice(0, 8)} placed on the Sansthan Ledger. The Central Desk is validating your payment. Once approved, your assigned Purohit's direct phone and details will unlock below!`,
@@ -767,7 +764,6 @@
        REAL AUTHENTICATION ENGINE (PHONE OTP + EMAIL)
     ======================================================== */
 
-    // Tab Switcher
     const tabPhone = document.getElementById("tab-auth-phone");
     const tabEmail = document.getElementById("tab-auth-email");
     const viewPhone = document.getElementById("auth-view-phone");
@@ -787,7 +783,6 @@
       viewPhone.classList.add("hidden");
     };
 
-    // Initialize Invisible RecaptchaVerifier
     function initRecaptcha() {
       if (!window.recaptchaVerifier) {
         window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
@@ -803,7 +798,6 @@
     // PHONE AUTH STEP 1: Send OTP
     document.getElementById("btn-send-otp").onclick = async () => {
       const rawNumber = document.getElementById("phone-auth-number").value.trim();
-      const devoteeName = document.getElementById("phone-auth-name").value.trim();
 
       if (!rawNumber || rawNumber.length < 10) {
         showToast("Please enter a valid 10-digit mobile number.", "error");
@@ -824,12 +818,22 @@
         document.getElementById("phone-step-2").classList.remove("hidden");
         document.getElementById("otp-target-phone").textContent = fullPhoneNumber;
 
-        // Start Resend Timer
         startResendTimer();
         showToast("6-Digit OTP sent successfully!", "success");
       } catch (err) {
         console.error("Phone Auth Error:", err);
-        showToast(err.message || "Failed to send SMS OTP.", "error");
+        
+        // Diagnostic helpful messaging
+        if (err.code === "auth/operation-not-allowed") {
+          showCustomModal({
+            title: "Phone Auth Disabled in Firebase",
+            message: "Please open your Firebase Console → Authentication → Sign-in method tab, and Enable 'Phone'. You can also use the Email tab or 1-Click Guest button.",
+            icon: "fa-gear"
+          });
+        } else {
+          showToast(err.message || "Failed to send SMS OTP.", "error");
+        }
+
         if (window.recaptchaVerifier) {
           window.recaptchaVerifier.clear();
           window.recaptchaVerifier = null;
@@ -858,7 +862,6 @@
         const result = await confirmationResultObj.confirm(otp);
         const user = result.user;
 
-        // Update profile name & sync with Firestore
         await updateProfile(user, { displayName: devoteeName });
         await setDoc(doc(db, "users", user.uid), {
           name: devoteeName,
@@ -868,7 +871,6 @@
         }, { merge: true });
 
         document.getElementById("auth-modal").classList.add("hidden");
-        sounds.playSuccess();
         showToast(`Welcome, ${devoteeName}!`, "success");
       } catch (err) {
         console.error("OTP Verification Error:", err);
@@ -923,7 +925,6 @@
         document.getElementById("auth-modal").classList.add("hidden");
         showToast("Logged in successfully!", "success");
       } catch (e) {
-        // If user does not exist, create new account
         if (e.code === "auth/user-not-found" || e.code === "auth/invalid-credential") {
           try {
             const res = await createUserWithEmailAndPassword(auth, email, pass);
@@ -996,7 +997,6 @@
         pill.classList.add("flex");
         loginBtn.classList.add("hidden");
 
-        // Fetch display name from Firestore if needed
         let dName = user.displayName || user.phoneNumber || user.email?.split("@")[0] || "Devotee";
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
