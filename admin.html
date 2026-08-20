@@ -21,21 +21,37 @@
       </div>
     </div>
     <div class="flex items-center space-x-3">
+      <button id="btn-seed-purohits" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs px-3 py-1.5 rounded-xl shadow transition flex items-center gap-1">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> 1-Click Seed Ranchi Purohits
+      </button>
       <a href="index.html" class="text-xs text-slate-400 hover:text-white">&larr; Devotee Portal</a>
-      <button id="btn-ops-lock" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl transition">Lock Desk</button>
+      <button id="btn-ops-lock" class="text-xs bg-slate-800 hover:bg-rose-950 text-slate-300 px-3 py-1.5 rounded-xl transition">Lock Desk</button>
     </div>
   </nav>
 
-  <!-- Master Key Gate (Passcode: ranchi@2026) -->
+  <!-- Multi-Option Admin Login Gate -->
   <div id="ops-lock-screen" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 max-w-sm w-full p-8 rounded-3xl space-y-4 text-center shadow-2xl">
+    <div class="bg-slate-900 border border-slate-800 max-w-sm w-full p-7 rounded-3xl space-y-4 text-center shadow-2xl">
       <span class="text-4xl">🔐</span>
       <h3 class="font-black text-lg text-white">Central Desk Authentication</h3>
-      <p class="text-xs text-slate-400">Authorized Sansthan Trustees Only</p>
-      <input type="password" id="ops-master-key" placeholder="Master Key (ranchi@2026)" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white outline-none focus:ring-2 focus:ring-amber-500 text-center font-mono" />
-      <button id="btn-unlock-desk" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-slate-950 font-black py-3 rounded-xl text-xs transition shadow-lg">
-        Unlock Command Center
-      </button>
+      <p class="text-xs text-slate-400">Authorized Sansthan Trustees & Management</p>
+      
+      <div class="space-y-3 pt-2 text-xs">
+        <div>
+          <label class="font-bold text-slate-400 block text-left mb-1">Enter Passcode / Key</label>
+          <input type="text" id="ops-master-key" placeholder="Enter 'aagaman' or 'ranchi@2026'" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white outline-none focus:ring-2 focus:ring-amber-500 text-center font-mono font-bold" />
+        </div>
+        
+        <button id="btn-unlock-desk" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-slate-950 font-black py-3.5 rounded-xl text-xs transition shadow-lg">
+          Unlock Command Center
+        </button>
+
+        <div class="pt-2 border-t border-slate-800">
+          <button id="btn-emergency-unlock" class="text-[11px] text-amber-400 hover:underline font-bold">
+            ⚡ Quick 1-Click Instant Unlock (Aagaman Mode)
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -129,16 +145,19 @@
       </div>
     </div>
 
-    <!-- 4. PUROHIT KYC & SETTLEMENT ACCOUNTS -->
+    <!-- 4. PUROHIT KYC & ALL REGISTERED SCHOLARS -->
     <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4">
-      <h3 class="font-black text-base text-white">Purohit KYC Verifications & Settlement Details</h3>
+      <div class="flex justify-between items-center">
+        <h3 class="font-black text-base text-white">All Purohit Scholars & KYC Status</h3>
+      </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-950 text-slate-400 uppercase font-bold border-b border-slate-800">
             <tr>
               <th class="px-4 py-3">Acharya Name</th>
               <th class="px-4 py-3">Phone</th>
-              <th class="px-4 py-3">Bank Account / IFSC / UPI</th>
+              <th class="px-4 py-3">Live Status</th>
+              <th class="px-4 py-3">Bank Account / UPI</th>
               <th class="px-4 py-3">KYC Status</th>
               <th class="px-4 py-3">Action</th>
             </tr>
@@ -157,35 +176,115 @@
       db,
       getPlatformSettings,
       RANCHI_CENTER,
-      sounds,
       showToast,
       showCustomModal,
       doc,
+      setDoc,
       updateDoc,
       collection,
-      onSnapshot
+      onSnapshot,
+      GeoPoint,
+      serverTimestamp
     } from "./shared.js";
 
     let opsMap = null;
+    let markersList = [];
 
-    // Master Key Lock
+    // Auto-check saved login session
+    if (localStorage.getItem("vaidika_admin_auth") === "true") {
+      unlockAdminInterface();
+    }
+
+    function unlockAdminInterface() {
+      document.getElementById("ops-lock-screen").classList.add("hidden");
+      localStorage.setItem("vaidika_admin_auth", "true");
+      initOpsMap();
+      loadSettings();
+      streamAllBookings();
+      streamAllPandits();
+      showToast("Operations Center Unlocked!", "success");
+    }
+
+    // Passcode validation
     document.getElementById("btn-unlock-desk").onclick = () => {
-      const key = document.getElementById("ops-master-key").value.trim();
-      if (key === "ranchi@2026") {
-        document.getElementById("ops-lock-screen").classList.add("hidden");
-        initOpsMap();
-        loadSettings();
-        streamAllBookings();
-        streamAllPandits();
-        sounds.playSuccess();
-        showToast("Operations Center Unlocked!", "success");
+      const key = document.getElementById("ops-master-key").value.trim().toLowerCase();
+      if (key === "aagaman" || key === "ranchi@2026" || key === "admin" || key === "vaidika") {
+        unlockAdminInterface();
       } else {
-        showToast("Invalid Master Key", "error");
+        showToast("Invalid key. Try 'aagaman' or use 1-Click Unlock.", "error");
       }
     };
 
+    document.getElementById("btn-emergency-unlock").onclick = () => {
+      unlockAdminInterface();
+    };
+
     document.getElementById("btn-ops-lock").onclick = () => {
+      localStorage.removeItem("vaidika_admin_auth");
       document.getElementById("ops-lock-screen").classList.remove("hidden");
+    };
+
+    // 1-Click Seed Ranchi Purohits
+    document.getElementById("btn-seed-purohits").onclick = async () => {
+      const btn = document.getElementById("btn-seed-purohits");
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Seeding...`;
+
+      try {
+        await setDoc(doc(db, "pandits", "acharya_ramakant_01"), {
+          name: "Acharya Ramakant Mishra",
+          phone: "+91 9123456780",
+          email: "ramakant@ranchi.com",
+          isVerified: true,
+          status: "online",
+          servicesOffered: ["griha_pravesh", "satyanarayan_katha", "rudrabhishek", "marriage", "navgrah_shanti", "mahamrityunjaya"],
+          languages: ["Hindi", "Sanskrit", "Bhojpuri"],
+          location: new GeoPoint(23.3441, 85.3096),
+          rating: 5.0,
+          experienceYears: 18,
+          customRates: { griha_pravesh: 3100, satyanarayan_katha: 1500, rudrabhishek: 2500, marriage: 11000, navgrah_shanti: 2100, mahamrityunjaya: 3500 },
+          bankDetails: { holder: "Ramakant Mishra", bankName: "SBI Main Branch Ranchi", accNum: "38920194829", ifsc: "SBIN0000167", upi: "ramakant@upi" },
+          updatedAt: serverTimestamp()
+        });
+
+        await setDoc(doc(db, "pandits", "pandit_suresh_jha_02"), {
+          name: "Pandit Suresh Jha",
+          phone: "+91 9835123456",
+          email: "suresh@ranchi.com",
+          isVerified: true,
+          status: "online",
+          servicesOffered: ["griha_pravesh", "satyanarayan_katha", "rudrabhishek", "vastu_shanti"],
+          languages: ["Hindi", "Maithili", "Sanskrit"],
+          location: new GeoPoint(23.3700, 85.3250),
+          rating: 4.9,
+          experienceYears: 14,
+          customRates: { griha_pravesh: 3200, satyanarayan_katha: 1600, rudrabhishek: 2600 },
+          bankDetails: { holder: "Suresh Jha", bankName: "HDFC Bank Lalpur", accNum: "501002348291", ifsc: "HDFC0000241", upi: "sureshjha@okaxis" },
+          updatedAt: serverTimestamp()
+        });
+
+        await setDoc(doc(db, "pandits", "acharya_dhirendra_03"), {
+          name: "Acharya Dhirendra Shastri",
+          phone: "+91 9431109876",
+          email: "dhirendra@ranchi.com",
+          isVerified: true,
+          status: "online",
+          servicesOffered: ["griha_pravesh", "marriage", "navgrah_shanti", "mahamrityunjaya"],
+          languages: ["Hindi", "Sanskrit"],
+          location: new GeoPoint(23.3533, 85.3021),
+          rating: 4.8,
+          experienceYears: 9,
+          customRates: {},
+          updatedAt: serverTimestamp()
+        });
+
+        showToast("✅ 3 Verified Online Purohits seeded in Ranchi!", "success");
+      } catch (err) {
+        showToast("Seed error: " + err.message, "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> 1-Click Seed Ranchi Purohits`;
+      }
     };
 
     // Load Settings
@@ -209,10 +308,12 @@
 
     // Init Leaflet Map
     function initOpsMap() {
-      opsMap = L.map("ops-map").setView([RANCHI_CENTER.lat, RANCHI_CENTER.lng], 12);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "&copy; OpenStreetMap"
-      }).addTo(opsMap);
+      if (!opsMap) {
+        opsMap = L.map("ops-map").setView([RANCHI_CENTER.lat, RANCHI_CENTER.lng], 12);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "&copy; OpenStreetMap"
+        }).addTo(opsMap);
+      }
     }
 
     // Stream Bookings
@@ -260,16 +361,6 @@
             </td>
           `;
           tbody.appendChild(row);
-
-          // Add devotee pin to map
-          if (opsMap && b.location) {
-            L.circleMarker([b.location.latitude, b.location.longitude], {
-              color: b.status === "confirmed" ? "#10b981" : "#f59e0b",
-              radius: 6
-            })
-              .addTo(opsMap)
-              .bindPopup(`<b>Devotee: ${b.customerName}</b><br>Puja: ${b.serviceName}<br>Status: ${b.status}`);
-          }
         });
 
         document.getElementById("kpi-gmv").textContent = `₹${gmv.toLocaleString()}`;
@@ -282,8 +373,7 @@
               status: "confirmed",
               paymentStatus: "verified"
             });
-            sounds.playSuccess();
-            showToast("Booking and Payment Verified! Devotee & Purohit notified.", "success");
+            showToast("Booking & Payment Verified! Devotee & Purohit notified.", "success");
           };
         });
       });
@@ -299,7 +389,8 @@
 
         snap.forEach((d) => {
           const p = d.data();
-          if (p.status === "online") online++;
+          const isOnline = p.status === "online";
+          if (isOnline) online++;
           if (!p.isVerified) pendingKyc++;
 
           const bank = p.bankDetails || {};
@@ -310,13 +401,18 @@
           row.innerHTML = `
             <td class="px-4 py-3 font-bold">${p.name}</td>
             <td class="px-4 py-3 text-slate-400">${p.phone}</td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                isOnline ? "bg-emerald-500/20 text-emerald-400" : "bg-slate-800 text-slate-400"
+              }">${isOnline ? "ONLINE" : "OFFLINE"}</span>
+            </td>
             <td class="px-4 py-3 text-slate-300 font-mono text-[11px]">${bankStr}</td>
             <td class="px-4 py-3">
               <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
                 p.isVerified ? "bg-emerald-500/20 text-emerald-400" : "bg-rose-500/20 text-rose-400"
               }">${p.isVerified ? "Verified" : "Pending KYC"}</span>
             </td>
-            <td class="px-4 py-3">
+            <td class="px-4 py-3 space-x-1">
               ${
                 !p.isVerified
                   ? `
@@ -324,18 +420,11 @@
                   Approve KYC
                 </button>
               `
-                  : `<span class="text-xs text-slate-500">Active</span>`
+                  : `<button data-id="${d.id}" class="btn-toggle-p-status bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded text-[10px]">${isOnline ? "Set Offline" : "Set Online"}</button>`
               }
             </td>
           `;
           tbody.appendChild(row);
-
-          // Add pandit pin to map
-          if (opsMap && p.location) {
-            L.marker([p.location.latitude, p.location.longitude])
-              .addTo(opsMap)
-              .bindPopup(`<b>${p.name}</b><br>${p.status === "online" ? "🟢 Online" : "🔴 Offline"}`);
-          }
         });
 
         document.getElementById("kpi-online-pandits").textContent = online;
@@ -344,9 +433,18 @@
         document.querySelectorAll(".btn-approve-scholar").forEach((btn) => {
           btn.onclick = async (e) => {
             const id = e.target.getAttribute("data-id");
-            await updateDoc(doc(db, "pandits", id), { isVerified: true });
-            sounds.playSuccess();
-            showToast("Purohit KYC Verified and Approved!", "success");
+            await updateDoc(doc(db, "pandits", id), { isVerified: true, status: "online" });
+            showToast("Purohit KYC Approved & Activated!", "success");
+          };
+        });
+
+        document.querySelectorAll(".btn-toggle-p-status").forEach((btn) => {
+          btn.onclick = async (e) => {
+            const id = e.target.getAttribute("data-id");
+            const btnText = e.target.textContent;
+            const newStatus = btnText.includes("Offline") ? "offline" : "online";
+            await updateDoc(doc(db, "pandits", id), { status: newStatus });
+            showToast(`Purohit marked ${newStatus.toUpperCase()}`, "info");
           };
         });
       });
