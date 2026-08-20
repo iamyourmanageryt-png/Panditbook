@@ -1,6 +1,6 @@
 /**
  * shared.js
- * Central Spiritual Engine, Sound Synthesizer, Custom Modals & Firebase Configuration
+ * Central Spiritual Engine, Sound Synthesizer, Custom Modals & Real Firebase Auth Engine
  */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
@@ -9,7 +9,11 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  signInAnonymously
+  signInAnonymously,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  sendPasswordResetEmail,
+  updateProfile
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore,
@@ -45,7 +49,7 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// Ranchi Coordinates
+// Ranchi Benchmark Coordinates
 export const RANCHI_CENTER = { lat: 23.3441, lng: 85.3096 };
 
 // Vedic Services Catalog
@@ -113,7 +117,7 @@ export const DEFAULT_SERVICES = [
 ];
 
 /* ========================================================
-   WEB AUDIO SOUND ENGINE (NO EXTERNAL AUDIO FILES NEEDED)
+   WEB AUDIO SOUND ENGINE
 ======================================================== */
 class SoundEngine {
   constructor() {
@@ -227,7 +231,7 @@ export function showCustomModal({ title, message, icon = "fa-om", confirmText = 
 
   const overlay = document.createElement("div");
   overlay.id = "vaidika-custom-modal";
-  overlay.className = "fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-fade-in";
+  overlay.className = "fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4";
   
   overlay.innerHTML = `
     <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-amber-500/40 text-white rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl shadow-amber-500/10">
@@ -279,6 +283,10 @@ export {
   signOut,
   onAuthStateChanged,
   signInAnonymously,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  sendPasswordResetEmail,
+  updateProfile,
   collection,
   doc,
   setDoc,
