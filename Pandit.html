@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Purohit Portal | Vaidika Ranchi Sansthan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-slate-900 border-b border-slate-800 px-5 py-4 flex justify-between items-center sticky top-0 z-40">
+    <div class="flex items-center space-x-2">
+      <span class="text-2xl">🪔</span>
+      <div>
+        <h1 class="font-black text-sm sm:text-base text-amber-400">Vaidika Purohit Partner Portal</h1>
+        <p class="text-[10px] text-slate-400">Ranchi Devasthan Network</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-3">
+      <a href="index.html" class="text-xs text-slate-400 hover:text-white">&larr; Devotee View</a>
+      <button id="btn-pandit-logout" class="hidden text-xs bg-slate-800 text-slate-300 px-3 py-1.5 rounded-xl hover:bg-rose-950 transition">Logout</button>
+    </div>
+  </nav>
+
+  <main class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
+    
+    <!-- AUTHENTICATION CARD -->
+    <div id="pandit-auth-card" class="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 max-w-md mx-auto space-y-4 shadow-2xl">
+      <div class="text-center space-y-1">
+        <span class="text-4xl">🕉️</span>
+        <h2 class="font-black text-xl text-white">Acharya & Purohit Sign In</h2>
+        <p class="text-xs text-slate-400">Join Ranchi's verified Vedic scholar network</p>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-300">Purohit Full Name</label>
+          <input type="text" id="p-name" placeholder="e.g. Acharya Ramakant Mishra" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-3 text-white outline-none focus:ring-2 focus:ring-amber-500 font-semibold" />
+        </div>
+        <div>
+          <label class="font-bold text-slate-300">Mobile Phone (for Audio alerts & Devotee calls)</label>
+          <input type="tel" id="p-phone" placeholder="e.g. +91 9123456780" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-3 text-white outline-none focus:ring-2 focus:ring-amber-500 font-semibold" />
+        </div>
+        <div>
+          <label class="font-bold text-slate-300">Email Address</label>
+          <input type="email" id="p-email" placeholder="purohit@ranchi.com" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-3 text-white outline-none focus:ring-2 focus:ring-amber-500 font-semibold" />
+        </div>
+        <div>
+          <label class="font-bold text-slate-300">Password</label>
+          <input type="password" id="p-pass" placeholder="••••••••" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-3 text-white outline-none focus:ring-2 focus:ring-amber-500" />
+        </div>
+
+        <button id="btn-pandit-login" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-slate-950 font-black py-3.5 rounded-xl shadow-lg transition text-xs">
+          Sign In / Register as Purohit
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="pandit-dashboard" class="hidden space-y-6">
+      
+      <!-- Top Status & Radar Toggle -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div>
+          <h2 id="dash-pandit-name" class="font-black text-xl text-white">Acharya Ramakant Mishra</h2>
+          <p id="dash-pandit-meta" class="text-xs text-slate-400">Ranchi Zone Purohit • Rating ★ 5.0</p>
+          <span id="dash-kyc-badge" class="inline-block mt-2 text-[10px] font-black uppercase px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+            KYC Status: Pending Verification
+          </span>
+        </div>
+
+        <div class="flex items-center space-x-3">
+          <span class="text-xs font-bold text-slate-400">Live Radar:</span>
+          <button id="btn-toggle-online" class="px-5 py-2.5 rounded-xl text-xs font-black border transition bg-emerald-500/20 text-emerald-400 border-emerald-500/40">
+            ONLINE
+          </button>
+        </div>
+      </div>
+
+      <!-- BANK ACCOUNT & DAKSHINA SETTLEMENT DETAILS -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <div>
+            <h3 class="font-black text-base text-white flex items-center gap-2">
+              <i class="fa-solid fa-building-columns text-amber-400"></i> Dakshina Bank Account & Settlement
+            </h3>
+            <p class="text-xs text-slate-400">All Dakshina payments will be disbursed here directly by the Central Desk.</p>
+          </div>
+          <button id="btn-save-bank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-4 py-2 rounded-xl text-xs transition">
+            Save Bank Details
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="font-bold text-slate-400">Account Holder Name</label>
+            <input type="text" id="bank-holder-name" placeholder="e.g. Ramakant Mishra" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:ring-2 focus:ring-amber-500" />
+          </div>
+          <div>
+            <label class="font-bold text-slate-400">Bank Name</label>
+            <input type="text" id="bank-name" placeholder="e.g. State Bank of India, Ranchi" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:ring-2 focus:ring-amber-500" />
+          </div>
+          <div>
+            <label class="font-bold text-slate-400">Bank Account Number</label>
+            <input type="password" id="bank-acc-num" placeholder="Account Number" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:ring-2 focus:ring-amber-500 font-mono" />
+          </div>
+          <div>
+            <label class="font-bold text-slate-400">Bank IFSC Code</label>
+            <input type="text" id="bank-ifsc" placeholder="SBIN0001234" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:ring-2 focus:ring-amber-500 font-mono uppercase" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="font-bold text-slate-400">Purohit Personal UPI ID (for instant settlement)</label>
+            <input type="text" id="bank-upi-id" placeholder="acharya@upi" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:ring-2 focus:ring-amber-500 font-mono" />
+          </div>
+        </div>
+      </div>
+
+      <!-- PUROHIT CUSTOM RATE CONFIGURATOR -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <div>
+            <h3 class="font-black text-base text-white">Your Custom Ritual Dakshina</h3>
+            <p class="text-xs text-slate-400">Adjust your personal fees. Devotees in Ranchi see your customized rates.</p>
+          </div>
+          <button id="btn-save-custom-rates" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-4 py-2 rounded-xl text-xs transition">
+            Update Rates
+          </button>
+        </div>
+
+        <div id="pandit-rates-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <!-- ACTIVE ASSIGNED PUJAS & DEVOTEE NAVIGATION RADAR -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+        <h3 class="font-black text-base text-white flex items-center gap-2">
+          <i class="fa-solid fa-map-location-dot text-amber-400"></i> Assigned Pujas & Devotee Routing
+        </h3>
+        <div id="pandit-active-bookings-list" class="space-y-4 text-xs">
+          <!-- Real-time confirmed bookings with live map & call buttons -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- PUROHIT MODULE SCRIPT -->
+  <script type="module">
+    import {
+      db,
+      auth,
+      DEFAULT_SERVICES,
+      sounds,
+      showToast,
+      showCustomModal,
+      doc,
+      setDoc,
+      getDoc,
+      updateDoc,
+      collection,
+      onSnapshot,
+      query,
+      where,
+      GeoPoint,
+      serverTimestamp,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "./shared.js";
+
+    let currentPanditId = null;
+    let panditProfile = null;
+
+    // Render Rates Inputs
+    function renderCustomRates(savedRates = {}) {
+      const container = document.getElementById("pandit-rates-container");
+      container.innerHTML = "";
+      DEFAULT_SERVICES.forEach((s) => {
+        const val = savedRates[s.id] || s.baseFare;
+        const div = document.createElement("div");
+        div.className = "bg-slate-950 p-3.5 rounded-2xl border border-slate-800 flex justify-between items-center";
+        div.innerHTML = `
+          <div>
+            <h5 class="font-bold text-xs text-white">${s.name}</h5>
+            <span class="text-[10px] text-slate-500">Base Fare: ₹${s.baseFare}</span>
+          </div>
+          <div class="flex items-center space-x-1">
+            <span class="text-slate-400 text-xs">₹</span>
+            <input type="number" data-service-id="${s.id}" value="${val}" class="pandit-rate-input w-24 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-right font-black text-amber-400 outline-none focus:ring-1 focus:ring-amber-500" />
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Save Bank Details
+    document.getElementById("btn-save-bank").onclick = async () => {
+      const holder = document.getElementById("bank-holder-name").value.trim();
+      const bankName = document.getElementById("bank-name").value.trim();
+      const accNum = document.getElementById("bank-acc-num").value.trim();
+      const ifsc = document.getElementById("bank-ifsc").value.trim();
+      const upi = document.getElementById("bank-upi-id").value.trim();
+
+      try {
+        await updateDoc(doc(db, "pandits", currentPanditId), {
+          bankDetails: { holder, bankName, accNum, ifsc, upi },
+          updatedAt: serverTimestamp()
+        });
+        showToast("Bank settlement details saved safely!", "success");
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    };
+
+    // Save Custom Rates
+    document.getElementById("btn-save-custom-rates").onclick = async () => {
+      const inputs = document.querySelectorAll(".pandit-rate-input");
+      const rates = {};
+      inputs.forEach((inp) => {
+        rates[inp.getAttribute("data-service-id")] = parseInt(inp.value, 10);
+      });
+      await updateDoc(doc(db, "pandits", currentPanditId), { customRates: rates });
+      showToast("Custom Dakshina rates updated!", "success");
+    };
+
+    // Toggle Online
+    document.getElementById("btn-toggle-online").onclick = async () => {
+      if (!panditProfile) return;
+      const next = panditProfile.status === "online" ? "offline" : "online";
+      await updateDoc(doc(db, "pandits", currentPanditId), { status: next });
+    };
+
+    // Listen For Confirmed Bookings Assigned to This Purohit
+    function listenAssignedBookings(panditId) {
+      const q = query(
+        collection(db, "bookings"),
+        where("status", "==", "confirmed"),
+        where("assignedPanditId", "==", panditId)
+      );
+
+      onSnapshot(q, (snap) => {
+        const container = document.getElementById("pandit-active-bookings-list");
+        container.innerHTML = "";
+
+        if (snap.empty) {
+          container.innerHTML = `<p class="text-slate-500 text-center py-4">No active assigned pujas at this moment.</p>`;
+          return;
+        }
+
+        snap.forEach((d) => {
+          const b = d.data();
+          const lat = b.location?.latitude || 23.3441;
+          const lng = b.location?.longitude || 85.3096;
+          const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+
+          const card = document.createElement("div");
+          card.className = "bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3";
+          card.innerHTML = `
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-black text-sm text-amber-400">${b.serviceName}</h4>
+                <p class="text-slate-300 text-xs mt-0.5">Devotee: <b>${b.customerName}</b> (Gotra: ${b.gotra || "N/A"})</p>
+                <p class="text-slate-400 text-[11px]">Sankalp: ${b.familyNames || "Family"}</p>
+                <p class="text-slate-400 text-[11px] mt-1">📍 ${b.address}</p>
+              </div>
+              <div class="text-right">
+                <span class="text-emerald-400 font-black text-sm">₹${b.pricing?.totalAmount}</span>
+                <span class="block text-[10px] text-emerald-300 font-bold uppercase mt-1">Confirmed ✓</span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
+              <a href="tel:${b.customerPhone}" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-2.5 px-3 rounded-xl text-center text-xs transition">
+                <i class="fa-solid fa-phone mr-1"></i> Call Devotee
+              </a>
+              <a href="${navUrl}" target="_blank" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-2.5 px-3 rounded-xl text-center text-xs transition">
+                <i class="fa-solid fa-diamond-turn-right mr-1"></i> GPS Navigate
+              </a>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      });
+    }
+
+    // Auth Handling
+    document.getElementById("btn-pandit-login").onclick = async () => {
+      const email = document.getElementById("p-email").value.trim();
+      const pass = document.getElementById("p-pass").value.trim();
+      const name = document.getElementById("p-name").value.trim();
+      const phone = document.getElementById("p-phone").value.trim();
+
+      if (!email || !pass) {
+        showToast("Please provide Email & Password", "error");
+        return;
+      }
+
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        showToast("Signed in successfully!", "success");
+      } catch (e) {
+        const res = await createUserWithEmailAndPassword(auth, email, pass);
+        await setDoc(doc(db, "pandits", res.user.uid), {
+          name: name || "Acharya Purohit",
+          phone: phone || "+91 9123456780",
+          email,
+          isVerified: false,
+          status: "online",
+          servicesOffered: ["griha_pravesh", "satyanarayan_katha", "rudrabhishek", "marriage", "navgrah_shanti", "mahamrityunjaya"],
+          languages: ["Hindi", "Sanskrit"],
+          location: new GeoPoint(23.3441, 85.3096),
+          rating: 5.0,
+          customRates: {},
+          createdAt: serverTimestamp()
+        });
+        showToast("Purohit Account Registered!", "success");
+      }
+    };
+
+    document.getElementById("btn-pandit-logout").onclick = () => signOut(auth);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentPanditId = user.uid;
+        document.getElementById("pandit-auth-card").classList.add("hidden");
+        document.getElementById("pandit-dashboard").classList.remove("hidden");
+        document.getElementById("btn-pandit-logout").classList.remove("hidden");
+
+        onSnapshot(doc(db, "pandits", currentPanditId), (docSnap) => {
+          if (docSnap.exists()) {
+            panditProfile = docSnap.data();
+            document.getElementById("dash-pandit-name").textContent = panditProfile.name;
+            document.getElementById("dash-pandit-meta").textContent = `Phone: ${panditProfile.phone} • Rating ★ ${panditProfile.rating || "5.0"}`;
+
+            const kycBadge = document.getElementById("dash-kyc-badge");
+            kycBadge.textContent = panditProfile.isVerified ? "KYC Status: Verified Scholar ✓" : "KYC Status: Pending Verification";
+            kycBadge.className = panditProfile.isVerified
+              ? "inline-block mt-2 text-[10px] font-black uppercase px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+              : "inline-block mt-2 text-[10px] font-black uppercase px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30";
+
+            const btnStatus = document.getElementById("btn-toggle-online");
+            const isOnline = panditProfile.status === "online";
+            btnStatus.textContent = isOnline ? "ONLINE" : "OFFLINE";
+            btnStatus.className = isOnline
+              ? "px-5 py-2.5 rounded-xl text-xs font-black border transition bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
+              : "px-5 py-2.5 rounded-xl text-xs font-black border transition bg-slate-800 text-slate-400 border-slate-700";
+
+            if (panditProfile.bankDetails) {
+              document.getElementById("bank-holder-name").value = panditProfile.bankDetails.holder || "";
+              document.getElementById("bank-name").value = panditProfile.bankDetails.bankName || "";
+              document.getElementById("bank-acc-num").value = panditProfile.bankDetails.accNum || "";
+              document.getElementById("bank-ifsc").value = panditProfile.bankDetails.ifsc || "";
+              document.getElementById("bank-upi-id").value = panditProfile.bankDetails.upi || "";
+            }
+
+            renderCustomRates(panditProfile.customRates || {});
+            listenAssignedBookings(currentPanditId);
+          }
+        });
+      } else {
+        document.getElementById("pandit-auth-card").classList.remove("hidden");
+        document.getElementById("pandit-dashboard").classList.add("hidden");
+        document.getElementById("btn-pandit-logout").classList.add("hidden");
+      }
+    });
+  </script>
+</body>
+</html>
