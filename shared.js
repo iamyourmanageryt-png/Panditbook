@@ -1,6 +1,6 @@
 /**
  * shared.js
- * Central Spiritual Engine, Sound Synthesizer, Custom Modals & Real Firebase Auth Engine
+ * Central Spiritual Engine & Real Firebase Auth Engine
  */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
@@ -117,76 +117,9 @@ export const DEFAULT_SERVICES = [
 ];
 
 /* ========================================================
-   WEB AUDIO SOUND ENGINE
-======================================================== */
-class SoundEngine {
-  constructor() {
-    this.ctx = null;
-  }
-  init() {
-    if (!this.ctx) {
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (this.ctx.state === "suspended") {
-      this.ctx.resume();
-    }
-  }
-  playNotification() {
-    this.init();
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = "triangle";
-    osc.frequency.setValueAtTime(523.25, now);
-    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.15);
-    gain.gain.setValueAtTime(0.3, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.4);
-  }
-  playSuccess() {
-    this.init();
-    const now = this.ctx.currentTime;
-    const notes = [440, 554.37, 659.25, 880];
-    notes.forEach((freq, i) => {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(freq, now + i * 0.1);
-      gain.gain.setValueAtTime(0.2, now + i * 0.1);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.4);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start(now + i * 0.1);
-      osc.stop(now + i * 0.1 + 0.4);
-    });
-  }
-  playTempleBell() {
-    this.init();
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(880, now);
-    osc.frequency.exponentialRampToValueAtTime(440, now + 1.2);
-    gain.gain.setValueAtTime(0.4, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    osc.start(now);
-    osc.stop(now + 1.2);
-  }
-}
-
-export const sounds = new SoundEngine();
-
-/* ========================================================
-   CUSTOM TOAST & DIALOG ENGINE
+   SILENT CUSTOM TOAST & DIALOG ENGINE (NO NOISY AUDIO)
 ======================================================== */
 export function showToast(message, type = "info") {
-  sounds.playNotification();
   let container = document.getElementById("vaidika-toast-container");
   if (!container) {
     container = document.createElement("div");
@@ -225,7 +158,6 @@ export function showToast(message, type = "info") {
 }
 
 export function showCustomModal({ title, message, icon = "fa-om", confirmText = "Acknowledge", cancelText = null, onConfirm = null }) {
-  sounds.playTempleBell();
   const existing = document.getElementById("vaidika-custom-modal");
   if (existing) existing.remove();
 
