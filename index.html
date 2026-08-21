@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vaidika Ranchi | Doorstep Vedic Pujas & Verified Purohits</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    @keyframes pulse-subtle { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    .animate-pulse-subtle { animation: pulse-subtle 3s infinite ease-in-out; }
+  </style>
+</head>
+<body class="bg-amber-50/40 text-slate-900 font-sans min-h-screen flex flex-col justify-between selection:bg-orange-500 selection:text-white">
+
+  <!-- TOP AUSPICIOUS LIVE MUHURAT BAR -->
+  <div class="bg-gradient-to-r from-amber-700 via-orange-600 to-amber-800 text-white text-xs font-bold px-4 py-2 text-center flex items-center justify-center gap-3 shadow-sm">
+    <span class="animate-bounce">🪔</span>
+    <span>Ranchi Vedic Muhurat Window: <b id="live-muhurat-text" class="text-amber-200">Shukla Paksha Auspicious Sankalp Active</b></span>
+    <span class="hidden md:inline-block bg-black/25 px-2.5 py-0.5 rounded-full text-[11px]">Next Rahu Kaal: 04:30 PM</span>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-amber-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
+      <a href="index.html" class="flex items-center space-x-2.5">
+        <span class="text-3xl drop-shadow">🕉️</span>
+        <div>
+          <span class="font-black text-xl sm:text-2xl text-orange-600 tracking-tight">Vaidika</span>
+          <span class="text-[10px] block font-bold text-amber-900 uppercase tracking-widest leading-none">Ranchi Sansthan</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <div class="hidden md:flex items-center space-x-8 text-xs font-bold text-slate-700">
+        <a href="#pujas-section" class="hover:text-orange-600 transition flex items-center gap-1.5"><i class="fa-solid fa-om text-orange-500"></i> Vedic Pujas</a>
+        <a href="#problem-solver" class="hover:text-orange-600 transition flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-emerald-600"></i> Dosha Relief</a>
+        <a href="#why-vaidika" class="hover:text-orange-600 transition flex items-center gap-1.5"><i class="fa-solid fa-certificate text-amber-500"></i> Shastra Verified</a>
+      </div>
+
+      <!-- User Action Controls -->
+      <div class="flex items-center space-x-3">
+        <!-- Logged In Profile Pill -->
+        <div id="nav-user-pill" class="hidden items-center space-x-2 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-2xl text-xs font-bold text-orange-950 cursor-pointer hover:bg-orange-100 transition shadow-sm">
+          <span class="w-6 h-6 rounded-full bg-orange-600 text-white flex items-center justify-center text-[10px] font-black" id="nav-user-avatar">D</span>
+          <span id="nav-user-name" class="truncate max-w-[120px]">Devotee</span>
+          <button id="btn-open-profile-drawer" title="My Account" class="text-orange-600 hover:text-orange-800 ml-1"><i class="fa-solid fa-user-gear"></i></button>
+        </div>
+
+        <!-- Logged Out Button -->
+        <button id="btn-nav-login" class="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-2xl shadow-md shadow-orange-500/20 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-user-shield"></i>
+          <span>Devotee Login</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================= 1. HIGH-CONVERSION HERO SECTION ================= -->
+  <section class="relative bg-gradient-to-b from-orange-600 via-amber-600 to-orange-700 text-white py-16 sm:py-24 px-4 overflow-hidden shadow-inner">
+    <div class="max-w-5xl mx-auto text-center space-y-6 relative z-10">
+      
+      <div class="inline-flex items-center gap-2 bg-black/25 border border-white/20 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider backdrop-blur-sm">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+        <span>Ranchi Verified Purohit Network Active</span>
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
+        Invoke Divine Grace & Peace with <span class="text-amber-200 underline decoration-amber-400 decoration-wavy">Authentic Vedic Purohits</span>
+      </h1>
+      
+      <p class="text-orange-100 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+        Doorstep sacred rituals performed strictly as per Rigveda & Yajurveda traditions across Ranchi. Choose your auspicious time slot, select your preferred Purohit, and pay with zero hidden fees.
+      </p>
+
+      <!-- Trust Badges Bar -->
+      <div class="pt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto text-left text-xs">
+        <div class="bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/15">
+          <i class="fa-solid fa-award text-amber-300 text-lg mb-1"></i>
+          <p class="font-extrabold text-white">KYC Verified Scholars</p>
+          <p class="text-[11px] text-orange-100">Certified Sanskrit purohits</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/15">
+          <i class="fa-solid fa-truck-fast text-amber-300 text-lg mb-1"></i>
+          <p class="font-extrabold text-white">100% Pure Samagri</p>
+          <p class="text-[11px] text-orange-100">Pure Ghee, Gangajal, Herbs</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/15">
+          <i class="fa-solid fa-hand-holding-dollar text-amber-300 text-lg mb-1"></i>
+          <p class="font-extrabold text-white">Transparent Rates</p>
+          <p class="text-[11px] text-orange-100">Set directly by each Purohit</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/15">
+          <i class="fa-solid fa-phone-volume text-amber-300 text-lg mb-1"></i>
+          <p class="font-extrabold text-white">Direct Direct Calling</p>
+          <p class="text-[11px] text-orange-100">Real contact numbers unlocked</p>
+        </div>
+      </div>
+
+      <div class="pt-4 flex justify-center gap-4">
+        <a href="#pujas-section" class="bg-slate-950 text-amber-400 hover:bg-slate-900 px-8 py-4 rounded-2xl font-black text-sm shadow-2xl transition transform hover:scale-105 inline-flex items-center gap-2">
+          <span>Book Sacred Puja</span>
+          <i class="fa-solid fa-arrow-down"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 2. ACTIVE PUJA LIVE TRACKING BANNER ================= -->
+  <section id="active-puja-tracker-banner" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
+    <div class="bg-gradient-to-r from-slate-950 to-slate-900 text-white p-6 rounded-3xl border-2 border-amber-500 shadow-2xl space-y-4">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+        <div class="space-y-1">
+          <span class="bg-amber-500 text-slate-950 text-[10px] font-black uppercase px-3 py-1 rounded-full animate-pulse">
+            ● Live In-Progress Puja Lock
+          </span>
+          <h3 id="active-banner-service" class="text-xl font-black text-amber-300">Griha Pravesh Puja</h3>
+          <p id="active-banner-slot" class="text-xs text-slate-400">Scheduled: Today • 09:00 AM - 12:00 PM</p>
+        </div>
+
+        <div class="flex items-center space-x-3 w-full md:w-auto">
+          <div class="text-left md:text-right text-xs">
+            <span class="text-slate-400 block">Assigned Purohit:</span>
+            <span id="active-banner-pandit" class="font-black text-white text-sm">Acharya Ramakant Mishra</span>
+          </div>
+          <!-- Dynamic Real Call Button -->
+          <a id="active-banner-call-btn" href="tel:+919123456780" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs px-4 py-3 rounded-2xl shadow-lg flex items-center gap-2">
+            <i class="fa-solid fa-phone"></i> Call Purohit
+          </a>
+        </div>
+      </div>
+
+      <!-- Live Stepper Progression -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-3 border-t border-slate-800 text-[11px]">
+        <div id="track-step-pay" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 flex items-center gap-2">
+          <i class="fa-solid fa-receipt text-amber-400"></i> Payment Verified
+        </div>
+        <div id="track-step-assigned" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 flex items-center gap-2">
+          <i class="fa-solid fa-user-check text-amber-400"></i> Pandit Assigned
+        </div>
+        <div id="track-step-departed" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 flex items-center gap-2">
+          <i class="fa-solid fa-person-walking text-amber-400"></i> Departed Home
+        </div>
+        <div id="track-step-arrived" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 flex items-center gap-2">
+          <i class="fa-solid fa-door-open text-amber-400"></i> Arrived at Venue
+        </div>
+        <div id="track-step-progress" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 flex items-center gap-2">
+          <i class="fa-solid fa-fire text-amber-400"></i> Puja In Progress
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 3. SACRED PUJA CATALOG (STEP 1: NO PREMATURE PRICES) ================= -->
+  <section id="pujas-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-8">
+    <div class="text-center space-y-2">
+      <span class="text-xs font-black text-orange-600 uppercase tracking-widest">Ancient Vedic Rituals</span>
+      <h2 class="text-3xl sm:text-4xl font-black text-slate-900">Select Your Sacred Puja</h2>
+      <p class="text-xs sm:text-sm text-slate-500 max-w-xl mx-auto">Click any ritual below to select your preferred date, time window, and Purohit with customized rates.</p>
+    </div>
+
+    <!-- Ritual Cards Grid -->
+    <div id="catalog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Injected via JavaScript with NO PRICES -->
+    </div>
+  </section>
+
+  <!-- ================= 4. DOSHA RELIEF & WHY VAIDIKA ================= -->
+  <section id="problem-solver" class="bg-white py-16 border-y border-amber-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <div class="text-center space-y-2">
+        <span class="text-xs font-black text-orange-600 uppercase tracking-widest">Spiritual Remedies</span>
+        <h2 class="text-3xl font-black text-slate-900">Which Vedic Sankalp Do You Require?</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-6 rounded-3xl bg-amber-50/50 border border-amber-200/60 space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-orange-600 text-white flex items-center justify-center text-xl shadow-md">
+            <i class="fa-solid fa-house-chimney-crack"></i>
+          </div>
+          <h3 class="font-bold text-base text-slate-900">New Home / Vastu Dosha</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Entering an uncleansed premise can cause unrest. Our Griha Pravesh invokes Lord Ganesha, Navgrah, and Vastu Devata for auspicious beginnings.</p>
+        </div>
+
+        <div class="p-6 rounded-3xl bg-amber-50/50 border border-amber-200/60 space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-purple-600 text-white flex items-center justify-center text-xl shadow-md">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          <h3 class="font-bold text-base text-slate-900">Business & Career Turbulence</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Planetary transitions can cause sudden hurdles. Navgrah Shanti Havan calms Shani and Rahu-Ketu, clearing professional blockages.</p>
+        </div>
+
+        <div class="p-6 rounded-3xl bg-amber-50/50 border border-amber-200/60 space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-xl shadow-md">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <h3 class="font-bold text-base text-slate-900">Health Anxieties & Surgeries</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Maha Rudrabhishek with cow milk and holy Ganga Jal invokes Mahadev’s healing shield against chronic ailments and accidents.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 5. INTERACTIVE BOOKING STEPPER MODAL ================= -->
+  <div id="booking-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-amber-100 my-8">
+      
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+        <div>
+          <span id="modal-step-badge" class="text-[10px] font-black text-orange-600 uppercase tracking-widest">Step 1 of 3</span>
+          <h3 id="modal-service-title" class="text-xl font-black text-slate-900">Griha Pravesh & Vastu Shanti</h3>
+        </div>
+        <button id="btn-close-booking-modal" class="text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
+      </div>
+
+      <!-- STEP 1: DATE & TIME SLOT SELECTION -->
+      <div id="book-step-slot" class="space-y-4">
+        <h4 class="text-sm font-bold text-slate-900">1. Select Auspicious Date & Time Window</h4>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-bold text-slate-600 block mb-1">Puja Date</label>
+            <input type="date" id="book-date-input" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-800 outline-none focus:ring-2 focus:ring-orange-500" />
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-600 block mb-1">Auspicious Slot (Muhurat)</label>
+            <select id="book-slot-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-800 outline-none focus:ring-2 focus:ring-orange-500">
+              <option value="06:00 AM - 09:00 AM (Brahma Muhurat)">06:00 AM - 09:00 AM (Brahma Muhurat)</option>
+              <option value="09:00 AM - 12:00 PM (Pratah Kaal)" selected>09:00 AM - 12:00 PM (Pratah Kaal)</option>
+              <option value="02:00 PM - 05:00 PM (Madhyahna)">02:00 PM - 05:00 PM (Madhyahna)</option>
+              <option value="06:00 PM - 09:00 PM (Sandhya Aarti)">06:00 PM - 09:00 PM (Sandhya Aarti)</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="btn-to-step-pandits" class="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 text-white font-black py-3.5 rounded-2xl shadow-lg transition text-xs flex items-center justify-center gap-2">
+          <span>Choose Verified Purohit & Custom Rates</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+
+      <!-- STEP 2: SELECT PUROHIT (PRICE APPEARS HERE EXCLUSIVELY) -->
+      <div id="book-step-pandit" class="hidden space-y-4">
+        <div class="flex justify-between items-center">
+          <h4 class="text-sm font-bold text-slate-900">2. Select Purohit (Rates Set Directly by Acharyas)</h4>
+          <button id="btn-back-to-slot" class="text-xs text-orange-600 font-bold hover:underline">&larr; Back</button>
+        </div>
+
+        <div id="modal-pandits-list" class="space-y-3 max-h-72 overflow-y-auto pr-1">
+          <!-- Dynamic pandits with their custom rates -->
+        </div>
+      </div>
+
+      <!-- STEP 3: ADDRESS GPS PIN, SANKALP & DYNAMIC PAYMENT -->
+      <div id="book-step-payment" class="hidden space-y-4">
+        <div class="flex justify-between items-center">
+          <h4 class="text-sm font-bold text-slate-900">3. Doorstep Address & Dakshina Payment</h4>
+          <button id="btn-back-to-pandits" class="text-xs text-orange-600 font-bold hover:underline">&larr; Back</button>
+        </div>
+
+        <!-- Devotee Details -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div>
+            <label class="font-bold text-slate-600">Devotee Gotra</label>
+            <input type="text" id="modal-input-gotra" placeholder="e.g. Kashyap, Bharadwaj" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold outline-none focus:ring-2 focus:ring-orange-500" />
+          </div>
+          <div>
+            <label class="font-bold text-slate-600">Family Members for Sankalp</label>
+            <input type="text" id="modal-input-family" placeholder="e.g. Amitabh, Ritu & Children" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold outline-none focus:ring-2 focus:ring-orange-500" />
+          </div>
+        </div>
+
+        <!-- Leaflet Geolocation Map Picker -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-bold text-slate-700">Ranchi Doorstep Venue (Map Pin)</label>
+            <button id="btn-auto-detect-gps" class="text-[11px] text-orange-600 font-black flex items-center gap-1 hover:underline">
+              <i class="fa-solid fa-location-crosshairs animate-pulse"></i> Auto-Detect My GPS
+            </button>
+          </div>
+          <div id="modal-map" class="h-44 w-full rounded-2xl border border-slate-200 z-10 shadow-inner"></div>
+          <input type="text" id="modal-input-address" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold outline-none focus:ring-2 focus:ring-orange-500" value="Harmu Housing Colony, Ranchi, Jharkhand" />
+        </div>
+
+        <!-- Invoice Breakdown -->
+        <div class="bg-amber-50/70 p-4 rounded-2xl border border-amber-200 space-y-2 text-xs">
+          <div class="flex justify-between">
+            <span id="modal-invoice-pandit-label">Purohit Dakshina</span>
+            <span id="modal-invoice-dakshina" class="font-bold text-slate-900">₹3,100</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Pure Vedic Samagri & Havan Kit</span>
+            <span id="modal-invoice-samagri" class="font-bold text-slate-900">₹850</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Sansthan Platform Care</span>
+            <span class="font-bold text-slate-900">₹150</span>
+          </div>
+          <div class="flex justify-between pt-2 border-t border-amber-200 text-sm font-black text-orange-600">
+            <span>Total Payable</span>
+            <span id="modal-invoice-total">₹4,100</span>
+          </div>
+        </div>
+
+        <!-- UPI Payment Box -->
+        <div class="bg-white p-4 rounded-2xl border border-orange-200 space-y-3">
+          <span class="text-[11px] font-black uppercase text-orange-700 block">Sansthan Central Payment Desk</span>
+          <div class="flex items-center gap-4">
+            <img id="modal-upi-qr" src="" alt="UPI QR" class="w-24 h-24 rounded-xl border border-slate-100 shadow-sm" />
+            <div class="text-xs space-y-1">
+              <p class="font-black text-slate-900">Scan via GPay / PhonePe / Paytm</p>
+              <p class="text-[11px] text-slate-500 font-mono" id="modal-upi-id-text">vaidika.ranchi@okaxis</p>
+              <a id="modal-upi-intent-link" href="#" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1 rounded-lg text-[10px] mt-1 shadow">
+                1-Tap Mobile UPI Intent
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs font-bold text-slate-700">Enter Payment UTR / Transaction Reference ID</label>
+            <input type="text" id="modal-input-utr" placeholder="12-digit UTR (e.g. 429381048291)" class="w-full mt-1 bg-slate-50 border border-orange-300 rounded-xl p-2.5 text-xs font-mono font-bold outline-none focus:ring-2 focus:ring-orange-500" />
+          </div>
+        </div>
+
+        <button id="btn-submit-final-puja" class="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 text-white font-black py-4 rounded-2xl shadow-xl transition text-xs flex items-center justify-center gap-2">
+          <i class="fa-solid fa-hands-praying"></i>
+          <span>Confirm & Lock Puja Booking</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 6. DEVOTEE PROFILE & PUJA HISTORY DRAWER ================= -->
+  <div id="profile-drawer" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex justify-end">
+    <div class="bg-white w-full max-w-md h-full p-6 space-y-6 flex flex-col justify-between overflow-y-auto shadow-2xl animate-slide-left">
+      <div class="space-y-6">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+          <h3 class="font-black text-lg text-slate-900 flex items-center gap-2">
+            <span class="text-xl">🕉️</span> My Devotee Profile
+          </h3>
+          <button id="btn-close-profile-drawer" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+        </div>
+
+        <!-- Devotee Details Card -->
+        <div class="bg-orange-50/70 p-4 rounded-2xl border border-orange-200 space-y-2">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-full bg-orange-600 text-white flex items-center justify-center font-black text-lg shadow-md" id="drawer-user-initial">
+              D
+            </div>
+            <div>
+              <h4 id="drawer-user-name" class="font-black text-base text-slate-900">Amitabh Verma</h4>
+              <p id="drawer-user-phone" class="text-xs text-slate-500 font-mono">+91 9876543210</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Puja History Stream -->
+        <div class="space-y-3">
+          <h4 class="font-black text-xs text-slate-400 uppercase tracking-widest">Sacred Puja History</h4>
+          <div id="drawer-history-list" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+            <!-- Dynamic History Cards with Real Assigned Phone -->
+          </div>
+        </div>
+      </div>
+
+      <button id="btn-drawer-logout" class="w-full bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-700 font-bold py-3 rounded-2xl transition text-xs flex items-center justify-center gap-2 border border-slate-200">
+        <i class="fa-solid fa-power-off"></i> Logout from Vaidika
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= 7. DEVOTEE AUTH MODAL ================= -->
+  <div id="auth-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 space-y-4 shadow-2xl relative border border-amber-100">
+      <button id="btn-close-auth-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+      
+      <div class="text-center space-y-1">
+        <span class="text-3xl">🕉️</span>
+        <h3 class="font-black text-lg text-slate-900" id="auth-modal-title">Devotee Sign In</h3>
+        <p class="text-xs text-slate-500">Sign in with your 10-digit mobile number and PIN</p>
+      </div>
+
+      <!-- Auth Mode Switcher -->
+      <div class="flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
+        <button id="tab-login-mode" class="flex-1 py-2 rounded-lg bg-white text-orange-600 shadow-sm transition">Login</button>
+        <button id="tab-register-mode" class="flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition">New Register</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div id="auth-name-field" class="hidden">
+          <label class="font-bold text-slate-600">Devotee Full Name</label>
+          <input type="text" id="auth-input-name" placeholder="e.g. Amitabh Verma" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium outline-none focus:ring-2 focus:ring-orange-500" />
+        </div>
+        <div>
+          <label class="font-bold text-slate-600">Mobile Phone Number (India)</label>
+          <div class="flex mt-1">
+            <span class="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-slate-200 bg-slate-50 text-slate-500 font-bold text-xs">+91</span>
+            <input type="tel" id="auth-input-phone" placeholder="9876543210" maxlength="10" class="w-full border border-slate-200 rounded-r-xl p-2.5 font-mono font-bold text-sm tracking-wider outline-none focus:ring-2 focus:ring-orange-500" />
+          </div>
+        </div>
+        <div>
+          <label class="font-bold text-slate-600">4-Digit Security PIN</label>
+          <input type="password" id="auth-input-pin" placeholder="••••" maxlength="4" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono font-black text-center text-base tracking-[0.3em] outline-none focus:ring-2 focus:ring-orange-500" />
+        </div>
+
+        <button id="btn-execute-auth" class="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 text-white font-black py-3 rounded-xl shadow-md transition">
+          Sign In
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 text-slate-400 py-10 border-t border-slate-800 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="text-center sm:text-left space-y-1">
+        <p class="font-black text-white text-sm">Vaidika Spiritual Services Sansthan</p>
+        <p class="text-slate-500">ISO 9001:2015 Certified Vedic Trust • Ranchi, Jharkhand</p>
+      </div>
+
+      <!-- Discreet Purohit Portal Link -->
+      <div class="flex items-center space-x-6 text-slate-400 font-bold text-xs">
+        <a href="admin.html" class="hover:text-slate-200 transition">Central Ops Desk</a>
+        <span>•</span>
+        <a href="pandit.html" class="text-amber-400 hover:underline flex items-center gap-1.5">
+          <i class="fa-solid fa-user-tie"></i> Purohit Partner Portal
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- CUSTOMER LOGIC MODULE SCRIPT -->
+  <script type="module">
+    import {
+      db,
+      auth,
+      DEFAULT_SERVICES,
+      RANCHI_CENTER,
+      showToast,
+      showCustomModal,
+      getPlatformSettings,
+      collection,
+      doc,
+      setDoc,
+      getDoc,
+      addDoc,
+      onSnapshot,
+      query,
+      where,
+      GeoPoint,
+      serverTimestamp,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "./shared.js";
+
+    let currentUser = null;
+    let activeBooking = null;
+    let selectedService = null;
+    let selectedSlot = "09:00 AM - 12:00 PM (Pratah Kaal)";
+    let selectedDate = new Date().toISOString().split("T")[0];
+    let selectedPandit = null;
+    let platformSettings = null;
+    let modalMap = null, modalMarker = null;
+    let devoteeCoords = { lat: 23.3533, lng: 85.3021 };
+    let isRegisterMode = false;
+
+    document.getElementById("book-date-input").value = selectedDate;
+
+    // 1. Render Catalog Grid (NO PRICES)
+    function renderCatalog() {
+      const container = document.getElementById("catalog-grid");
+      container.innerHTML = "";
+
+      DEFAULT_SERVICES.forEach((s) => {
+        const card = document.createElement("div");
+        card.className = "bg-white rounded-3xl border border-amber-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group";
+        card.innerHTML = `
+          <div>
+            <div class="h-44 overflow-hidden relative">
+              <img src="${s.image}" alt="${s.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+              <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-amber-300 font-black text-[10px] px-2.5 py-1 rounded-full">
+                <i class="fa-solid fa-clock mr-1"></i> ${s.duration}
+              </div>
+            </div>
+            <div class="p-6 space-y-3">
+              <div class="space-y-1">
+                <h3 class="font-black text-lg text-slate-900 group-hover:text-orange-600 transition">${s.name}</h3>
+                <span class="text-xs text-amber-700 font-bold block">${s.hindiName}</span>
+              </div>
+              <p class="text-xs text-slate-500 leading-relaxed">${s.tagline}</p>
+              <ul class="space-y-1.5 pt-2 border-t border-slate-100 text-[11px] text-slate-600">
+                ${s.benefits.map(b => `<li class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i> ${b}</li>`).join("")}
+              </ul>
+            </div>
+          </div>
+          <div class="p-6 pt-0">
+            <button class="btn-open-booking w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 text-white font-black py-3.5 rounded-2xl shadow-md transition text-xs flex items-center justify-center gap-2">
+              <span>Select Date & View Purohit Rates</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        `;
+
+        card.querySelector(".btn-open-booking").onclick = () => {
+          if (activeBooking) {
+            showCustomModal({
+              title: "Active Puja in Progress",
+              message: "You have an active Puja in progress. Please track its live progress on the top banner before booking another ceremony.",
+              icon: "fa-lock"
+            });
+            return;
+          }
+          openBookingModal(s);
+        };
+        container.appendChild(card);
+      });
+    }
+
+    // 2. Open Booking Stepper Modal
+    function openBookingModal(service) {
+      selectedService = service;
+      selectedPandit = null;
+      document.getElementById("modal-service-title").textContent = `${service.name} (${service.hindiName})`;
+      switchModalStep(1);
+      document.getElementById("booking-modal").classList.remove("hidden");
+    }
+
+    function switchModalStep(stepNum) {
+      document.getElementById("modal-step-badge").textContent = `Step ${stepNum} of 3`;
+      document.getElementById("book-step-slot").classList.toggle("hidden", stepNum !== 1);
+      document.getElementById("book-step-pandit").classList.toggle("hidden", stepNum !== 2);
+      document.getElementById("book-step-payment").classList.toggle("hidden", stepNum !== 3);
+    }
+
+    document.getElementById("btn-close-booking-modal").onclick = () => {
+      document.getElementById("booking-modal").classList.add("hidden");
+    };
+
+    document.getElementById("btn-back-to-slot").onclick = () => switchModalStep(1);
+    document.getElementById("btn-back-to-pandits").onclick = () => switchModalStep(2);
+
+    document.getElementById("btn-to-step-pandits").onclick = () => {
+      selectedDate = document.getElementById("book-date-input").value;
+      selectedSlot = document.getElementById("book-slot-select").value;
+      loadVerifiedPanditsForBooking();
+      switchModalStep(2);
+    };
+
+    // 3. Load Verified Pandits with Custom Rates (ONLY APPROVED PUROHITS APPEAR)
+    function loadVerifiedPanditsForBooking() {
+      const container = document.getElementById("modal-pandits-list");
+      container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Finding verified scholars in Ranchi...</p>`;
+
+      onSnapshot(collection(db, "pandits"), (snap) => {
+        container.innerHTML = "";
+        const available = [];
+
+        snap.forEach((d) => {
+          const p = { id: d.id, ...d.data() };
+          // STRICT REQUIREMENT: Only approved (isVerified === true) & online Pandits
+          if (p.isVerified === true && p.status === "online") {
+            available.push(p);
+          }
+        });
+
+        // Sort by Featured Ad Boost if active
+        available.sort((a, b) => (b.featuredBoost ? 1 : 0) - (a.featuredBoost ? 1 : 0));
+
+        if (available.length === 0) {
+          container.innerHTML = `
+            <div class="bg-amber-50 p-6 rounded-2xl border border-amber-200 text-center space-y-2">
+              <p class="text-xs text-amber-950 font-bold">No Purohit currently online for this instant slot.</p>
+              <p class="text-[11px] text-amber-700">Our Sansthan Central Desk will assign a scholar upon booking submission.</p>
+            </div>
+          `;
+          return;
+        }
+
+        available.forEach((p) => {
+          const dakshina = (p.customRates && p.customRates[selectedService.id]) ? p.customRates[selectedService.id] : 3100;
+          const card = document.createElement("div");
+          card.className = `p-4 rounded-2xl border-2 transition cursor-pointer flex justify-between items-center ${
+            p.featuredBoost ? "border-amber-500 bg-amber-50/60 shadow-md" : "border-slate-100 hover:border-orange-300 bg-white"
+          }`;
+
+          card.innerHTML = `
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-black text-sm">
+                🕉️
+              </div>
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <h4 class="font-black text-xs text-slate-900">${p.name}</h4>
+                  ${p.featuredBoost ? `<span class="bg-amber-500 text-slate-950 font-black text-[9px] px-1.5 py-0.5 rounded">⭐ Featured</span>` : ""}
+                </div>
+                <p class="text-[10px] text-slate-500">${p.experienceYears || 12}+ Yrs Exp • ${p.languages?.join(", ") || "Hindi, Sanskrit"}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-slate-400 block font-bold">Purohit Dakshina:</span>
+              <span class="text-base font-black text-orange-600">₹${dakshina.toLocaleString()}</span>
+            </div>
+          `;
+
+          card.onclick = () => {
+            selectedPandit = { ...p, calculatedDakshina: dakshina };
+            setupStep3Payment(dakshina);
+            switchModalStep(3);
+          };
+          container.appendChild(card);
+        });
+      });
+    }
+
+    // 4. Setup Step 3 Payment & Leaflet Map
+    async function setupStep3Payment(dakshina) {
+      if (!platformSettings) {
+        platformSettings = await getPlatformSettings();
+      }
+
+      const samagri = selectedService.samagriFee || 850;
+      const platformFee = 150;
+      const total = dakshina + samagri + platformFee;
+
+      document.getElementById("modal-invoice-pandit-label").textContent = `${selectedPandit.name} Dakshina`;
+      document.getElementById("modal-invoice-dakshina").textContent = `₹${dakshina.toLocaleString()}`;
+      document.getElementById("modal-invoice-samagri").textContent = `₹${samagri.toLocaleString()}`;
+      document.getElementById("modal-invoice-total").textContent = `₹${total.toLocaleString()}`;
+
+      const upiUri = `upi://pay?pa=${encodeURIComponent(platformSettings.upiId)}&pn=${encodeURIComponent(platformSettings.upiPayeeName)}&am=${total}&cu=INR&tn=Puja_${selectedService.id}`;
+      document.getElementById("modal-upi-qr").src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiUri)}`;
+      document.getElementById("modal-upi-intent-link").href = upiUri;
+      document.getElementById("modal-upi-id-text").textContent = platformSettings.upiId;
+
+      setTimeout(() => initModalMap(), 200);
+    }
+
+    function initModalMap() {
+      if (!modalMap) {
+        modalMap = L.map("modal-map").setView([devoteeCoords.lat, devoteeCoords.lng], 13);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "&copy; OpenStreetMap"
+        }).addTo(modalMap);
+
+        modalMarker = L.marker([devoteeCoords.lat, devoteeCoords.lng], { draggable: true }).addTo(modalMap);
+
+        modalMarker.on("dragend", (e) => {
+          const p = e.target.getLatLng();
+          devoteeCoords = { lat: p.lat, lng: p.lng };
+          reverseGeocodeAddress(p.lat, p.lng);
+        });
+
+        modalMap.on("click", (e) => {
+          modalMarker.setLatLng(e.latlng);
+          devoteeCoords = { lat: e.latlng.lat, lng: e.latlng.lng };
+          reverseGeocodeAddress(e.latlng.lat, e.latlng.lng);
+        });
+      } else {
+        modalMap.invalidateSize();
+      }
+    }
+
+    async function reverseGeocodeAddress(lat, lng) {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+        const d = await res.json();
+        if (d && d.display_name) {
+          document.getElementById("modal-input-address").value = d.display_name;
+        }
+      } catch (e) {}
+    }
+
+    document.getElementById("btn-auto-detect-gps").onclick = () => {
+      if (navigator.geolocation) {
+        showToast("Detecting your exact GPS location...", "info");
+        navigator.geolocation.getCurrentPosition((pos) => {
+          devoteeCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          if (modalMap) {
+            modalMap.setView([devoteeCoords.lat, devoteeCoords.lng], 15);
+            modalMarker.setLatLng([devoteeCoords.lat, devoteeCoords.lng]);
+          }
+          reverseGeocodeAddress(devoteeCoords.lat, devoteeCoords.lng);
+          showToast("GPS Location Pin Locked!", "success");
+        });
+      }
+    };
+
+    // 5. Submit Booking & Lock In-Progress
+    document.getElementById("btn-submit-final-puja").onclick = async () => {
+      const utr = document.getElementById("modal-input-utr").value.trim();
+      const address = document.getElementById("modal-input-address").value.trim();
+      const gotra = document.getElementById("modal-input-gotra").value.trim();
+      const family = document.getElementById("modal-input-family").value.trim();
+
+      if (!currentUser) {
+        document.getElementById("auth-modal").classList.remove("hidden");
+        return;
+      }
+      if (!utr) {
+        showToast("Please enter the 12-digit Payment UTR / Reference ID.", "error");
+        return;
+      }
+
+      const totalAmount = selectedPandit.calculatedDakshina + (selectedService.samagriFee || 850) + 150;
+
+      try {
+        // REAL DEVOTEE & PUROHIT PHONE NUMBERS USED
+        const docRef = await addDoc(collection(db, "bookings"), {
+          customerId: currentUser.uid,
+          customerName: currentUser.displayName || "Devotee",
+          customerPhone: currentUser.phoneNumber || "+91 9876543210",
+          serviceId: selectedService.id,
+          serviceName: selectedService.name,
+          scheduledDate: selectedDate,
+          scheduledSlot: selectedSlot,
+          address,
+          location: new GeoPoint(devoteeCoords.lat, devoteeCoords.lng),
+          gotra: gotra || "Not Specified",
+          familyNames: family || "Family",
+          assignedPanditId: selectedPandit.id,
+          assignedPanditName: selectedPandit.name,
+          assignedPanditPhone: selectedPandit.phone || "+91 9123456780", // REAL PUROHIT PHONE
+          status: "pending_verification",
+          paymentStatus: "submitted",
+          paymentUtr: utr,
+          pricing: {
+            dakshina: selectedPandit.calculatedDakshina,
+            samagriFee: selectedService.samagriFee || 850,
+            platformFee: 150,
+            totalAmount
+          },
+          createdAt: serverTimestamp()
+        });
+
+        document.getElementById("booking-modal").classList.add("hidden");
+        showToast("✨ Puja Booking Placed! Central Desk is verifying payment.", "success");
+      } catch (err) {
+        showToast("Booking failed: " + err.message, "error");
+      }
+    };
+
+    // 6. Listen to Active Booking Lock & Tracking Banner
+    function listenActiveBooking(uid) {
+      const q = query(collection(db, "bookings"), where("customerId", "==", uid));
+
+      onSnapshot(q, (snap) => {
+        let active = null;
+        const historyContainer = document.getElementById("drawer-history-list");
+        historyContainer.innerHTML = "";
+
+        snap.forEach((d) => {
+          const b = { id: d.id, ...d.data() };
+          if (["pending_verification", "confirmed", "departed", "arrived", "in_progress"].includes(b.status)) {
+            active = b;
+          }
+
+          // History item
+          const item = document.createElement("div");
+          item.className = "bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-1 text-xs";
+          item.innerHTML = `
+            <div class="flex justify-between font-bold text-slate-900">
+              <span>${b.serviceName}</span>
+              <span class="text-orange-600">₹${b.pricing?.totalAmount}</span>
+            </div>
+            <div class="flex justify-between text-[11px] text-slate-500">
+              <span>Purohit: <b>${b.assignedPanditName || "Sansthan"}</b></span>
+              <span class="font-bold uppercase text-${b.status === 'completed' ? 'emerald' : 'amber'}-600">${b.status}</span>
+            </div>
+            ${b.assignedPanditPhone ? `<a href="tel:${b.assignedPanditPhone}" class="inline-block mt-1 text-[10px] text-emerald-700 font-bold"><i class="fa-solid fa-phone mr-1"></i> Call ${b.assignedPanditPhone}</a>` : ""}
+          `;
+          historyContainer.appendChild(item);
+        });
+
+        activeBooking = active;
+        const banner = document.getElementById("active-puja-tracker-banner");
+
+        if (active) {
+          banner.classList.remove("hidden");
+          document.getElementById("active-banner-service").textContent = active.serviceName;
+          document.getElementById("active-banner-slot").textContent = `Scheduled: ${active.scheduledDate} • ${active.scheduledSlot}`;
+          document.getElementById("active-banner-pandit").textContent = active.assignedPanditName || "Purohit Assigned";
+          document.getElementById("active-banner-call-btn").href = `tel:${active.assignedPanditPhone || '+919123456780'}`;
+
+          // Stepper highlight
+          const steps = {
+            pay: document.getElementById("track-step-pay"),
+            assigned: document.getElementById("track-step-assigned"),
+            departed: document.getElementById("track-step-departed"),
+            arrived: document.getElementById("track-step-arrived"),
+            progress: document.getElementById("track-step-progress")
+          };
+
+          Object.values(steps).forEach(s => s.className = "p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-500 flex items-center gap-2");
+
+          if (active.status === "pending_verification") {
+            steps.pay.className = "p-2.5 rounded-xl bg-amber-500/20 border border-amber-500 text-amber-300 font-bold flex items-center gap-2";
+          } else if (active.status === "confirmed") {
+            steps.pay.className = steps.assigned.className = "p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500 text-emerald-300 font-bold flex items-center gap-2";
+          } else if (active.status === "departed") {
+            steps.pay.className = steps.assigned.className = steps.departed.className = "p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500 text-emerald-300 font-bold flex items-center gap-2";
+          } else if (active.status === "arrived") {
+            steps.pay.className = steps.assigned.className = steps.departed.className = steps.arrived.className = "p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500 text-emerald-300 font-bold flex items-center gap-2";
+          } else if (active.status === "in_progress") {
+            steps.pay.className = steps.assigned.className = steps.departed.className = steps.arrived.className = steps.progress.className = "p-2.5 rounded-xl bg-amber-500/20 border border-amber-500 text-amber-300 font-bold flex items-center gap-2 animate-pulse";
+          }
+        } else {
+          banner.classList.add("hidden");
+        }
+      });
+    }
+
+    // 7. Devotee Auth Handlers
+    const tabLogin = document.getElementById("tab-login-mode");
+    const tabRegister = document.getElementById("tab-register-mode");
+    const nameField = document.getElementById("auth-name-field");
+    const authTitle = document.getElementById("auth-modal-title");
+    const btnExecAuth = document.getElementById("btn-execute-auth");
+
+    tabLogin.onclick = () => {
+      isRegisterMode = false;
+      tabLogin.className = "flex-1 py-2 rounded-lg bg-white text-orange-600 shadow-sm transition";
+      tabRegister.className = "flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition";
+      nameField.classList.add("hidden");
+      authTitle.textContent = "Devotee Sign In";
+      btnExecAuth.textContent = "Sign In";
+    };
+
+    tabRegister.onclick = () => {
+      isRegisterMode = true;
+      tabRegister.className = "flex-1 py-2 rounded-lg bg-white text-orange-600 shadow-sm transition";
+      tabLogin.className = "flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition";
+      nameField.classList.remove("hidden");
+      authTitle.textContent = "Devotee Registration";
+      btnExecAuth.textContent = "Create Account";
+    };
+
+    btnExecAuth.onclick = async () => {
+      const phone = document.getElementById("auth-input-phone").value.trim();
+      const pin = document.getElementById("auth-input-pin").value.trim();
+      const name = document.getElementById("auth-input-name").value.trim() || "Devotee";
+
+      if (!phone || phone.length < 10) {
+        showToast("Please enter a valid 10-digit mobile number.", "error");
+        return;
+      }
+      if (!pin || pin.length < 4) {
+        showToast("Please enter a 4-digit PIN.", "error");
+        return;
+      }
+
+      const pseudoEmail = `devotee_${phone.slice(-10)}@vaidika.internal`;
+      const pseudoPass = `pin_${pin}_${phone.slice(-4)}`;
+
+      if (isRegisterMode) {
+        try {
+          const res = await createUserWithEmailAndPassword(auth, pseudoEmail, pseudoPass);
+          await updateProfile(res.user, { displayName: name });
+          await setDoc(doc(db, "users", res.user.uid), {
+            name,
+            phone: `+91${phone.slice(-10)}`,
+            role: "customer",
+            createdAt: serverTimestamp()
+          });
+          document.getElementById("auth-modal").classList.add("hidden");
+          showToast(`Account Created! Welcome, ${name}!`, "success");
+        } catch (e) {
+          showToast(e.message, "error");
+        }
+      } else {
+        try {
+          await signInWithEmailAndPassword(auth, pseudoEmail, pseudoPass);
+          document.getElementById("auth-modal").classList.add("hidden");
+          showToast("Welcome back!", "success");
+        } catch (e) {
+          showToast("Invalid mobile number or PIN. Try registering if new.", "error");
+        }
+      }
+    };
+
+    document.getElementById("btn-nav-login").onclick = () => document.getElementById("auth-modal").classList.remove("hidden");
+    document.getElementById("btn-close-auth-modal").onclick = () => document.getElementById("auth-modal").classList.add("hidden");
+
+    document.getElementById("btn-open-profile-drawer").onclick = () => document.getElementById("profile-drawer").classList.remove("hidden");
+    document.getElementById("btn-close-profile-drawer").onclick = () => document.getElementById("profile-drawer").classList.add("hidden");
+    document.getElementById("btn-drawer-logout").onclick = () => {
+      signOut(auth);
+      document.getElementById("profile-drawer").classList.add("hidden");
+      showToast("Logged out.", "info");
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      const navPill = document.getElementById("nav-user-pill");
+      const navLogin = document.getElementById("btn-nav-login");
+
+      if (user) {
+        navPill.classList.remove("hidden");
+        navPill.classList.add("flex");
+        navLogin.classList.add("hidden");
+
+        let dName = user.displayName || "Devotee";
+        let dPhone = user.phoneNumber || "+91 9876543210";
+
+        try {
+          const uDoc = await getDoc(doc(db, "users", user.uid));
+          if (uDoc.exists()) {
+            dName = uDoc.data().name || dName;
+            dPhone = uDoc.data().phone || dPhone;
+          }
+        } catch (e) {}
+
+        document.getElementById("nav-user-name").textContent = dName;
+        document.getElementById("nav-user-avatar").textContent = dName.charAt(0).toUpperCase();
+        document.getElementById("drawer-user-name").textContent = dName;
+        document.getElementById("drawer-user-phone").textContent = dPhone;
+        document.getElementById("drawer-user-initial").textContent = dName.charAt(0).toUpperCase();
+
+        listenActiveBooking(user.uid);
+      } else {
+        navPill.classList.add("hidden");
+        navLogin.classList.remove("hidden");
+      }
+    });
+
+    // Initialize
+    renderCatalog();
+  </script>
+</body>
+</html>
