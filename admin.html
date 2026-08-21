@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Sansthan Central Operations HQ | Ranchi</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Leaflet Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen selection:bg-amber-500 selection:text-slate-950">
+
+  <!-- ================= TOP OPERATIONS NAVBAR ================= -->
+  <nav class="bg-slate-900 border-b border-slate-800 px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap justify-between items-center sticky top-0 z-40 shadow-xl">
+    <div class="flex items-center space-x-3">
+      <span class="text-2xl">⚡</span>
+      <div>
+        <h1 class="font-black text-sm sm:text-base text-amber-400 leading-none">Sansthan Central Operations HQ</h1>
+        <p class="text-[10px] text-slate-400">Ranchi Platform Dispatch, Financials & Scholar KYC</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center space-x-3 mt-2 sm:mt-0">
+      <!-- 1-Click Seed Button -->
+      <button id="btn-seed-purohits" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-slate-950 font-black text-xs px-3.5 py-2 rounded-xl shadow transition flex items-center gap-1.5 active:scale-95">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> 1-Click Seed Ranchi Purohits
+      </button>
+
+      <a href="index.html" class="text-xs text-slate-400 hover:text-white transition font-bold hidden md:inline-block">&larr; Devotee Portal</a>
+      
+      <button id="btn-ops-lock" class="text-xs bg-slate-800 hover:bg-rose-950 text-slate-300 px-3 py-2 rounded-xl border border-slate-700 transition flex items-center gap-1">
+        <i class="fa-solid fa-lock text-rose-400"></i> Lock Desk
+      </button>
+    </div>
+  </nav>
+
+  <!-- ================= MASTER PIN LOGIN OVERLAY ================= -->
+  <div id="ops-lock-screen" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 max-w-sm w-full p-7 rounded-3xl space-y-4 text-center shadow-2xl">
+      <div class="w-14 h-14 mx-auto rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl">
+        <i class="fa-solid fa-key"></i>
+      </div>
+      
+      <div>
+        <h3 class="font-black text-lg text-white">Central Operations Gate</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Authorized Sansthan Trustees & Management</p>
+      </div>
+      
+      <div class="space-y-3 pt-2 text-xs">
+        <div>
+          <label class="font-bold text-slate-400 block text-left mb-1">Master Passcode</label>
+          <input type="text" id="ops-master-key" placeholder="Enter 'aagaman' or 'ranchi@2026'" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white outline-none focus:ring-2 focus:ring-amber-500 text-center font-mono font-bold tracking-wider" />
+        </div>
+        
+        <button id="btn-unlock-desk" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-slate-950 font-black py-3.5 rounded-xl text-xs transition shadow-lg">
+          Unlock Command Center
+        </button>
+
+        <div class="pt-2 border-t border-slate-800">
+          <button id="btn-emergency-unlock" class="text-[11px] text-amber-400 hover:underline font-bold">
+            ⚡ Quick 1-Click Instant Unlock (Aagaman Mode)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN OPERATIONS DASHBOARD ================= -->
+  <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    
+    <!-- 1. TOP PLATFORM KPI METRICS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-md space-y-1">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+          <span>Gross Platform GMV</span>
+          <i class="fa-solid fa-indian-rupee-sign text-amber-400"></i>
+        </span>
+        <p id="kpi-gmv" class="text-2xl font-black text-white">₹0</p>
+      </div>
+
+      <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-md space-y-1">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+          <span>Pending Orders</span>
+          <i class="fa-solid fa-clock text-amber-400"></i>
+        </span>
+        <p id="kpi-pending-payments" class="text-2xl font-black text-amber-400">0</p>
+      </div>
+
+      <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-md space-y-1">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+          <span>Approved Active Purohits</span>
+          <i class="fa-solid fa-user-check text-emerald-400"></i>
+        </span>
+        <p id="kpi-approved-pandits" class="text-2xl font-black text-emerald-400">0</p>
+      </div>
+
+      <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-md space-y-1">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+          <span>Pending KYC Approvals</span>
+          <i class="fa-solid fa-user-shield text-rose-400"></i>
+        </span>
+        <p id="kpi-pending-kyc" class="text-2xl font-black text-rose-400">0</p>
+      </div>
+    </div>
+
+    <!-- 2. PUROHIT WALLET RECHARGE APPROVAL QUEUE -->
+    <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4 shadow-xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 class="font-black text-base text-white flex items-center gap-2">
+          <i class="fa-solid fa-money-bill-transfer text-emerald-400"></i> Purohit Wallet Top-Up Requests
+        </h3>
+        <span class="text-xs text-slate-400 font-mono">Live Requests</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-950 text-slate-400 uppercase font-bold border-b border-slate-800">
+            <tr>
+              <th class="px-4 py-3">Purohit Name</th>
+              <th class="px-4 py-3">Amount</th>
+              <th class="px-4 py-3">Payment UTR</th>
+              <th class="px-4 py-3">Action</th>
+            </tr>
+          </thead>
+          <tbody id="ops-wallet-tbody" class="divide-y divide-slate-800">
+            <!-- Injected via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. PUROHIT SCHOLAR MANAGEMENT & STRICT KYC APPROVAL -->
+    <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4 shadow-xl">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="font-black text-base text-white flex items-center gap-2">
+            <i class="fa-solid fa-user-tie text-amber-400"></i> Purohit Scholars (Strict KYC & Network Management)
+          </h3>
+          <p class="text-xs text-slate-400">Purohits will NOT appear on the devotee booking page until approved here.</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-950 text-slate-400 uppercase font-bold border-b border-slate-800">
+            <tr>
+              <th class="px-4 py-3">Scholar Name</th>
+              <th class="px-4 py-3">Phone Number</th>
+              <th class="px-4 py-3">Experience</th>
+              <th class="px-4 py-3">Bank Details / UPI</th>
+              <th class="px-4 py-3">Live Status</th>
+              <th class="px-4 py-3">KYC Status</th>
+              <th class="px-4 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ops-kyc-tbody" class="divide-y divide-slate-800">
+            <!-- Injected via JS with Approve & Delete buttons -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 4. LIVE BOOKINGS & DAKSHINA VERIFICATION LEDGER -->
+    <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4 shadow-xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 class="font-black text-base text-white flex items-center gap-2">
+          <i class="fa-solid fa-receipt text-amber-400"></i> Live Bookings & Order Dispatch Queue
+        </h3>
+        <span class="text-xs text-slate-400 font-mono">Real-time Feed</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-950 text-slate-400 uppercase font-bold border-b border-slate-800">
+            <tr>
+              <th class="px-4 py-3">Booking ID</th>
+              <th class="px-4 py-3">Devotee (Phone)</th>
+              <th class="px-4 py-3">Puja Ceremony</th>
+              <th class="px-4 py-3">Time Slot</th>
+              <th class="px-4 py-3">Payment UTR</th>
+              <th class="px-4 py-3">Dakshina</th>
+              <th class="px-4 py-3">Assigned Purohit</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3">Action</th>
+            </tr>
+          </thead>
+          <tbody id="ops-bookings-tbody" class="divide-y divide-slate-800">
+            <!-- Injected via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 5. PLATFORM PAYMENT GATEWAY & DISPATCH SETTINGS -->
+    <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4 shadow-xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="font-black text-base text-white flex items-center gap-2">
+            <i class="fa-solid fa-gears text-amber-400"></i> Platform Payment Gateway & UPI Settings
+          </h3>
+          <p class="text-xs text-slate-400">Controls how devotees pay across Ranchi (UPI QR, Link, or WhatsApp)</p>
+        </div>
+        <button id="btn-save-platform-settings" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-4 py-2 rounded-xl text-xs shadow transition">
+          Update Settings
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+        <div>
+          <label class="font-bold text-slate-400">Active Payment Mode</label>
+          <select id="cfg-pay-mode" class="w-full mt-1.5 bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:ring-2 focus:ring-amber-500 font-bold">
+            <option value="upi">Direct Dynamic UPI QR</option>
+            <option value="link">Payment Link (Razorpay / Cashfree)</option>
+            <option value="whatsapp">WhatsApp Order Verification</option>
+          </select>
+        </div>
+        <div>
+          <label class="font-bold text-slate-400">Sansthan Admin UPI ID (for QR)</label>
+          <input type="text" id="cfg-upi-id" placeholder="vaidika.ranchi@okaxis" class="w-full mt-1.5 bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white font-mono outline-none" />
+        </div>
+        <div>
+          <label class="font-bold text-slate-400">WhatsApp Desk Number</label>
+          <input type="text" id="cfg-wa-num" placeholder="919123456780" class="w-full mt-1.5 bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white font-mono outline-none" />
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. RANCHI REAL-TIME DISPATCH RADAR MAP -->
+    <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-3 shadow-xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+        <h3 class="font-black text-base text-white flex items-center gap-2">
+          <i class="fa-solid fa-radar text-amber-400"></i> Ranchi Real-Time Radar Map
+        </h3>
+        <span class="text-xs text-slate-400 font-mono">Live OpenStreetMap Pins</span>
+      </div>
+      <div id="ops-map" class="h-80 w-full rounded-2xl border border-slate-800 z-10 shadow-inner"></div>
+    </div>
+
+  </main>
+
+  <!-- ================= ADMIN LOGIC MODULE SCRIPT ================= -->
+  <script type="module">
+    import {
+      db,
+      getPlatformSettings,
+      RANCHI_CENTER,
+      showToast,
+      doc,
+      setDoc,
+      getDoc,
+      updateDoc,
+      deleteDoc,
+      collection,
+      onSnapshot,
+      GeoPoint,
+      serverTimestamp
+    } from "./shared.js";
+
+    let opsMap = null;
+    let mapMarkers = [];
+
+    // Check saved session in localStorage
+    if (localStorage.getItem("vaidika_admin_auth") === "true") {
+      unlockAdmin();
+    }
+
+    function unlockAdmin() {
+      document.getElementById("ops-lock-screen").classList.add("hidden");
+      localStorage.setItem("vaidika_admin_auth", "true");
+      initOpsMap();
+      loadSettings();
+      streamAllBookings();
+      streamAllPandits();
+      streamWalletRequests();
+      showToast("Command Center Unlocked!", "success");
+    }
+
+    // Login Passcode Handlers
+    document.getElementById("btn-unlock-desk").onclick = () => {
+      const key = document.getElementById("ops-master-key").value.trim().toLowerCase();
+      if (key === "aagaman" || key === "ranchi@2026" || key === "admin" || key === "vaidika") {
+        unlockAdmin();
+      } else {
+        showToast("Invalid Passcode. Try 'aagaman' or use 1-Click Unlock.", "error");
+      }
+    };
+
+    document.getElementById("btn-emergency-unlock").onclick = () => unlockAdmin();
+
+    document.getElementById("btn-ops-lock").onclick = () => {
+      localStorage.removeItem("vaidika_admin_auth");
+      document.getElementById("ops-lock-screen").classList.remove("hidden");
+    };
+
+    // 1-Click Seed Ranchi Purohits Function
+    document.getElementById("btn-seed-purohits").onclick = async () => {
+      const btn = document.getElementById("btn-seed-purohits");
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Seeding...`;
+
+      try {
+        await setDoc(doc(db, "pandits", "acharya_ramakant_01"), {
+          name: "Acharya Ramakant Mishra",
+          phone: "+91 9123456780",
+          email: "ramakant@ranchi.com",
+          isVerified: true, // APPROVED
+          status: "online",
+          servicesOffered: ["griha_pravesh", "satyanarayan_katha", "rudrabhishek", "marriage", "navgrah_shanti", "mahamrityunjaya"],
+          languages: ["Hindi", "Sanskrit", "Bhojpuri"],
+          location: new GeoPoint(23.3441, 85.3096),
+          rating: 5.0,
+          experienceYears: 18,
+          walletBalance: 200,
+          featuredBoost: true,
+          customRates: { griha_pravesh: 3100, satyanarayan_katha: 1500, rudrabhishek: 2500, marriage: 11000, navgrah_shanti: 2100, mahamrityunjaya: 3500 },
+          bankDetails: { holder: "Ramakant Mishra", bankName: "SBI Main Branch Ranchi", accNum: "38920194829", ifsc: "SBIN0000167", upi: "ramakant@okaxis" },
+          updatedAt: serverTimestamp()
+        });
+
+        await setDoc(doc(db, "pandits", "pandit_suresh_jha_02"), {
+          name: "Pandit Suresh Jha
