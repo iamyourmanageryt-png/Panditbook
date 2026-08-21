@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vaidika Ranchi | Doorstep Vedic Pujas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body class="bg-amber-50/40 text-slate-900 font-sans min-h-screen flex flex-col justify-between selection:bg-orange-500 selection:text-white">
+
+  <!-- TOP LIVE MUHURAT BANNER -->
+  <div class="bg-gradient-to-r from-amber-700 via-orange-600 to-amber-800 text-white text-xs font-bold px-4 py-2 text-center flex items-center justify-center gap-2 shadow-sm">
+    <span class="animate-pulse">🪔</span>
+    <span>Ranchi Auspicious Window: <b>Shukla Paksha Special Puja Sankalp Active</b></span>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-amber-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+      <a href="index.html" class="flex items-center space-x-2.5">
+        <span class="text-3xl">🕉️</span>
+        <div>
+          <span class="font-black text-xl text-orange-600 tracking-tight">Vaidika</span>
+          <span class="text-[10px] block font-bold text-amber-900 uppercase tracking-widest leading-none">Ranchi Sansthan</span>
+        </div>
+      </a>
+
+      <div class="flex items-center space-x-3">
+        <button id="btn-open-login-modal" class="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 text-white font-black text-xs px-5 py-2.5 rounded-2xl shadow-md transition flex items-center gap-1.5">
+          <i class="fa-solid fa-user"></i>
+          <span>Devotee Login</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <main class="flex-1 flex items-center justify-center px-4 py-16 sm:py-24">
+    <div class="max-w-4xl mx-auto text-center space-y-8">
+      
+      <div class="inline-flex items-center gap-2 bg-orange-100 border border-orange-200 text-orange-800 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-sm">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+        <span>Swiggy-Fast Vedic Purohit Dispatch in Ranchi</span>
+      </div>
+
+      <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-slate-950 leading-tight">
+        Book Doorstep Vedic Pujas in <span class="text-orange-600 underline decoration-amber-400 decoration-wavy">60 Seconds</span>
+      </h1>
+      
+      <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+        Select your sacred ritual, pick your auspicious time slot, choose from verified Ranchi Acharyas with custom transparent Dakshina, and track your Purohit live to your doorstep.
+      </p>
+
+      <!-- Central Action Button -->
+      <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <button id="btn-hero-book-now" class="w-full sm:w-auto bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 hover:from-orange-700 text-white font-black px-10 py-5 rounded-3xl text-base shadow-2xl shadow-orange-500/30 transition transform hover:scale-105 flex items-center justify-center gap-3">
+          <i class="fa-solid fa-hands-praying text-xl text-amber-200"></i>
+          <span>Book a Puja Now &rarr;</span>
+        </button>
+      </div>
+
+      <!-- Trust Badges -->
+      <div class="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 text-left text-xs max-w-3xl mx-auto">
+        <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm">
+          <i class="fa-solid fa-award text-orange-600 text-base mb-1"></i>
+          <p class="font-extrabold text-slate-900">Verified Acharyas</p>
+          <p class="text-[11px] text-slate-500">100% Shastra accredited</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm">
+          <i class="fa-solid fa-truck-fast text-orange-600 text-base mb-1"></i>
+          <p class="font-extrabold text-slate-900">Pure Samagri</p>
+          <p class="text-[11px] text-slate-500">Organic Havan ingredients</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm">
+          <i class="fa-solid fa-hand-holding-dollar text-orange-600 text-base mb-1"></i>
+          <p class="font-extrabold text-slate-900">Purohit Rates</p>
+          <p class="text-[11px] text-slate-500">Fixed & transparent Dakshina</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm">
+          <i class="fa-solid fa-radar text-orange-600 text-base mb-1"></i>
+          <p class="font-extrabold text-slate-900">Live Status Lock</p>
+          <p class="text-[11px] text-slate-500">Real-time ceremony updates</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- AUTH MODAL -->
+  <div id="auth-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 space-y-4 shadow-2xl relative border border-amber-100">
+      <button id="btn-close-auth-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+      
+      <div class="text-center space-y-1">
+        <span class="text-3xl">🕉️</span>
+        <h3 class="font-black text-lg text-slate-900" id="auth-modal-title">Devotee Sign In</h3>
+        <p class="text-xs text-slate-500">Enter your 10-digit mobile number and 4-digit PIN</p>
+      </div>
+
+      <!-- Mode Switcher -->
+      <div class="flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
+        <button id="tab-login-mode" class="flex-1 py-2 rounded-lg bg-white text-orange-600 shadow-sm transition">Login</button>
+        <button id="tab-register-mode" class="flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition">New Register</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div id="auth-name-field" class="hidden">
+          <label class="font-bold text-slate-600">Devotee Full Name</label>
+          <input type="text" id="auth-input-name" placeholder="e.g. Amitabh Verma" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium outline-none focus:ring-2 focus:ring-orange-500" />
+        </div>
+        <div>
+          <label class="font-bold text-slate-600">Mobile Phone Number (India)</label>
+          <div class="flex mt-1">
+            <span class="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-slate-200 bg-slate-50 text-slate-500 font-bold text-xs">+91</span>
+            <input type="tel" id="auth-input-phone" placeholder="9876543210" maxlength="10" class="w-full border border-slate-200 rounded-r-xl p-2.5 font-mono font-bold text-sm tracking-wider outline-none focus:ring-2 focus:ring-orange-500" />
+          </div>
+        </div>
+        <div>
+          <label class="font-bold text-slate-600">4-Digit Security PIN</label>
+          <input type="password" id="auth-input-pin" placeholder="••••" maxlength="4" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono font-black text-center text-base tracking-[0.3em] outline-none focus:ring-2 focus:ring-orange-500" />
+        </div>
+
+        <button id="btn-execute-auth" class="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 text-white font-black py-3.5 rounded-xl shadow-md transition text-xs">
+          Sign In & Continue &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-800 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="text-center sm:text-left space-y-1">
+        <p class="font-black text-white text-sm">Vaidika Spiritual Services Sansthan</p>
+        <p class="text-slate-500">ISO 9001:2015 Certified Vedic Trust • Ranchi, Jharkhand</p>
+      </div>
+      <div class="flex items-center space-x-6 text-slate-400 font-bold text-xs">
+        <a href="admin.html" class="hover:text-slate-200 transition">Central Ops Desk</a>
+        <span>•</span>
+        <a href="pandit.html" class="text-amber-400 hover:underline flex items-center gap-1.5">
+          <i class="fa-solid fa-user-tie"></i> Purohit Partner Portal
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPT -->
+  <script type="module">
+    import {
+      db,
+      auth,
+      showToast,
+      doc,
+      setDoc,
+      getDoc,
+      serverTimestamp,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      onAuthStateChanged,
+      updateProfile
+    } from "./shared.js";
+
+    let isRegisterMode = false;
+
+    // Check if already authenticated -> send to user.html
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Enforce role separation: Check if Purohit tries to login here
+        const pDoc = await getDoc(doc(db, "pandits", user.uid));
+        if (pDoc.exists()) {
+          // It is a Purohit! Deny access to devotee panel
+          showToast("Purohit accounts must log in via the Purohit Partner Portal.", "error");
+          await auth.signOut();
+          return;
+        }
+        window.location.href = "user.html";
+      }
+    });
+
+    document.getElementById("btn-hero-book-now").onclick = () => {
+      if (auth.currentUser) {
+        window.location.href = "user.html";
+      } else {
+        document.getElementById("auth-modal").classList.remove("hidden");
+      }
+    };
+
+    document.getElementById("btn-open-login-modal").onclick = () => {
+      document.getElementById("auth-modal").classList.remove("hidden");
+    };
+
+    document.getElementById("btn-close-auth-modal").onclick = () => {
+      document.getElementById("auth-modal").classList.add("hidden");
+    };
+
+    // Mode Toggle
+    const tabLogin = document.getElementById("tab-login-mode");
+    const tabRegister = document.getElementById("tab-register-mode");
+    const nameField = document.getElementById("auth-name-field");
+    const authTitle = document.getElementById("auth-modal-title");
+    const btnExecAuth = document.getElementById("btn-execute-auth");
+
+    tabLogin.onclick = () => {
+      isRegisterMode = false;
+      tabLogin.className = "flex-1 py-2 rounded-lg bg-white text-orange-600 shadow-sm transition font-bold";
+      tabRegister.className = "flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition font-bold";
+      nameField.classList.add("hidden");
+      authTitle.textContent = "Devotee Sign In";
+      btnExecAuth.textContent = "Sign In & Continue \u2192";
+    };
+
+    tabRegister.onclick = () => {
+      isRegisterMode = true;
+      tabRegister.className = "flex-1 py-2 rounded-lg bg-white text-orange-600 shadow-sm transition font-bold";
+      tabLogin.className = "flex-1 py-2 rounded-lg text-slate-500 hover:text-slate-900 transition font-bold";
+      nameField.classList.remove("hidden");
+      authTitle.textContent = "Devotee Registration";
+      btnExecAuth.textContent = "Create Account & Continue \u2192";
+    };
+
+    btnExecAuth.onclick = async () => {
+      const phone = document.getElementById("auth-input-phone").value.trim();
+      const pin = document.getElementById("auth-input-pin").value.trim();
+      const name = document.getElementById("auth-input-name").value.trim() || "Devotee";
+
+      if (!phone || phone.length < 10) {
+        showToast("Please enter a valid 10-digit mobile number.", "error");
+        return;
+      }
+      if (!pin || pin.length < 4) {
+        showToast("Please enter a 4-digit PIN.", "error");
+        return;
+      }
+
+      const pseudoEmail = `devotee_${phone.slice(-10)}@vaidika.internal`;
+      const pseudoPass = `pin_${pin}_${phone.slice(-4)}`;
+
+      if (isRegisterMode) {
+        try {
+          const res = await createUserWithEmailAndPassword(auth, pseudoEmail, pseudoPass);
+          await updateProfile(res.user, { displayName: name });
+          await setDoc(doc(db, "users", res.user.uid), {
+            name,
+            phone: `+91${phone.slice(-10)}`,
+            role: "customer",
+            createdAt: serverTimestamp()
+          });
+          window.location.href = "user.html";
+        } catch (e) {
+          showToast(e.message, "error");
+        }
+      } else {
+        try {
+          await signInWithEmailAndPassword(auth, pseudoEmail, pseudoPass);
+          window.location.href = "user.html";
+        } catch (e) {
+          showToast("Invalid mobile number or PIN. Try registering if new.", "error");
+        }
+      }
+    };
+  </script>
+</body>
+</html>
