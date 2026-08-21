@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vaidika App | Devotee Doorstep Puja</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    /* Viewport-locked Mobile App Shell */
+    body { touch-action: pan-y; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="h-full flex justify-center bg-slate-950 text-slate-100 font-sans select-none overflow-hidden">
+
+  <!-- ================= MASTER APP CONTAINER ================= -->
+  <div id="app-shell" class="w-full max-w-md h-full bg-slate-900 flex flex-col justify-between relative shadow-2xl overflow-hidden border-x border-slate-800">
+    
+    <!-- TOP APP HEADER -->
+    <header class="bg-slate-900/95 backdrop-blur-md px-4 py-3 border-b border-slate-800 flex justify-between items-center z-30 shrink-0">
+      <div class="flex items-center space-x-2">
+        <span class="text-2xl">🕉️</span>
+        <div>
+          <h1 class="font-black text-sm text-amber-400 tracking-tight leading-none">Vaidika</h1>
+          <span class="text-[9px] font-bold text-slate-400 tracking-widest uppercase">Ranchi Devotee App</span>
+        </div>
+      </div>
+
+      <!-- Auth State Indicator -->
+      <div class="flex items-center space-x-2">
+        <div id="app-user-pill" class="hidden items-center space-x-1.5 bg-slate-800 px-2.5 py-1 rounded-full border border-slate-700 text-xs">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span id="app-user-name" class="font-bold text-[11px] truncate max-w-[85px]">Devotee</span>
+          <button id="btn-app-logout" class="text-slate-400 hover:text-red-400 ml-1"><i class="fa-solid fa-power-off text-[10px]"></i></button>
+        </div>
+        <button id="btn-app-login" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs px-3 py-1.5 rounded-xl shadow transition">
+          Sign In
+        </button>
+      </div>
+    </header>
+
+    <!-- ================= MAIN APP SCREENS CONTAINER (VIEWPORT LOCKED) ================= -->
+    <main class="flex-1 overflow-y-auto no-scrollbar relative flex flex-col">
+
+      <!-- ================= SCREEN A: IN-PROGRESS TRACKING LOCK SCREEN ================= -->
+      <!-- Displayed automatically when an active booking is in progress. User CANNOT book another puja until completed -->
+      <section id="screen-tracking" class="hidden flex-1 p-4 flex flex-col justify-between space-y-4">
+        
+        <!-- Live Status Pill -->
+        <div class="bg-slate-950 p-4 rounded-3xl border border-amber-500/30 space-y-3 shadow-xl">
+          <div class="flex justify-between items-center">
+            <span class="bg-amber-500 text-slate-950 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full animate-pulse">
+              ● Live In-Progress Puja
+            </span>
+            <span id="track-booking-id" class="text-[10px] font-mono text-slate-400">#BK-0000</span>
+          </div>
+
+          <h2 id="track-service-title" class="text-lg font-black text-white">Griha Pravesh Puja</h2>
+          <p id="track-slot-text" class="text-xs text-amber-400 font-bold"><i class="fa-solid fa-calendar-clock mr-1"></i> Today • 08:00 AM - 11:00 AM</p>
+
+          <!-- Step-by-Step Live Status Stepper -->
+          <div class="space-y-2 pt-2 border-t border-slate-800">
+            <div id="step-pay" class="flex items-center space-x-2.5 text-xs text-slate-400">
+              <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+              <span>Dakshina Payment Submitted (Verifying)</span>
+            </div>
+            <div id="step-assigned" class="flex items-center space-x-2.5 text-xs text-slate-400">
+              <i class="fa-solid fa-user-check text-slate-600 text-sm"></i>
+              <span>Purohit Confirmed & Assigned</span>
+            </div>
+            <div id="step-departed" class="flex items-center space-x-2.5 text-xs text-slate-400">
+              <i class="fa-solid fa-person-walking text-slate-600 text-sm"></i>
+              <span>Purohit Departed from Home</span>
+            </div>
+            <div id="step-arrived" class="flex items-center space-x-2.5 text-xs text-slate-400">
+              <i class="fa-solid fa-door-open text-slate-600 text-sm"></i>
+              <span>Arrived at Venue</span>
+            </div>
+            <div id="step-progress" class="flex items-center space-x-2.5 text-xs text-slate-400">
+              <i class="fa-solid fa-fire text-slate-600 text-sm"></i>
+              <span>Havan & Puja In Progress</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Pandit & Call Card -->
+        <div id="track-pandit-box" class="bg-slate-950 p-4 rounded-3xl border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-11 h-11 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-black text-base border border-amber-500/30">
+                🕉️
+              </div>
+              <div>
+                <h4 id="track-pandit-name" class="font-black text-sm text-white">Acharya Ramakant Mishra</h4>
+                <p id="track-pandit-meta" class="text-[10px] text-slate-400">18+ Yrs Exp • Rigveda Scholar</p>
+              </div>
+            </div>
+            <a id="btn-track-call-pandit" href="tel:+919123456780" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-md">
+              <i class="fa-solid fa-phone"></i> Call
+            </a>
+          </div>
+        </div>
+
+        <!-- Live Leaflet Routing Map -->
+        <div class="bg-slate-950 p-3 rounded-3xl border border-slate-800 space-y-2 flex-1 flex flex-col min-h-[160px]">
+          <span class="text-[10px] font-bold text-slate-400 uppercase"><i class="fa-solid fa-location-dot text-red-400 mr-1"></i> Venue: <span id="track-address-text" class="text-slate-200">Harmu Colony, Ranchi</span></span>
+          <div id="track-live-map" class="flex-1 w-full rounded-2xl border border-slate-800 z-10"></div>
+        </div>
+      </section>
+
+
+      <!-- ================= SCREEN B: PUJA BOOKING FLOW (WHEN NO PUJA IN PROGRESS) ================= -->
+      <section id="screen-booking-flow" class="flex-1 p-4 flex flex-col justify-between space-y-4">
+        
+        <!-- STEP 1: SELECT PUJA (STRICTLY NO PRICE SHOWN) -->
+        <div id="booking-step-1" class="space-y-3">
+          <div class="space-y-0.5">
+            <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest">Step 1 of 4</span>
+            <h2 class="text-lg font-black text-white">Select Sacred Ritual</h2>
+            <p class="text-xs text-slate-400">Choose the Vedic ceremony you wish to perform.</p>
+          </div>
+
+          <div id="app-puja-list" class="space-y-2.5 overflow-y-auto max-h-[calc(100vh-250px)] no-scrollbar pb-6">
+            <!-- Dynamic Ritual Cards without any prices -->
+          </div>
+        </div>
+
+        <!-- STEP 2: SELECT TIME DURATION / SLOTS -->
+        <div id="booking-step-2" class="hidden space-y-4">
+          <div class="space-y-0.5">
+            <button id="btn-back-to-step-1" class="text-xs text-amber-400 font-bold mb-1"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest block">Step 2 of 4</span>
+            <h2 class="text-lg font-black text-white" id="step2-puja-title">Select Date & Time Window</h2>
+            <p class="text-xs text-slate-400">Pandits will be assigned strictly for this duration.</p>
+          </div>
+
+          <!-- Date Selector -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
+            <label class="text-xs font-bold text-slate-300">Puja Date</label>
+            <input type="date" id="booking-date" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white font-bold outline-none focus:ring-2 focus:ring-amber-500" />
+          </div>
+
+          <!-- Time Window Slots -->
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-slate-300">Auspicious Time Slot (Muhurat)</label>
+            <div class="grid grid-cols-2 gap-2" id="slot-options-container">
+              <button data-slot="06:00 AM - 09:00 AM (Brahma Muhurat)" class="slot-btn p-3 bg-slate-950 border border-slate-800 rounded-2xl text-left hover:border-amber-500 transition active:scale-95">
+                <span class="font-black text-xs text-white block">06:00 AM - 09:00 AM</span>
+                <span class="text-[10px] text-amber-400 font-bold">Brahma Muhurat</span>
+              </button>
+              <button data-slot="09:00 AM - 12:00 PM (Pratah Kaal)" class="slot-btn p-3 bg-slate-950 border border-slate-800 rounded-2xl text-left hover:border-amber-500 transition active:scale-95 border-amber-500 bg-amber-500/10">
+                <span class="font-black text-xs text-white block">09:00 AM - 12:00 PM</span>
+                <span class="text-[10px] text-amber-400 font-bold">Pratah Kaal</span>
+              </button>
+              <button data-slot="02:00 PM - 05:00 PM (Madhyahna)" class="slot-btn p-3 bg-slate-950 border border-slate-800 rounded-2xl text-left hover:border-amber-500 transition active:scale-95">
+                <span class="font-black text-xs text-white block">02:00 PM - 05:00 PM</span>
+                <span class="text-[10px] text-slate-400">Madhyahna</span>
+              </button>
+              <button data-slot="06:00 PM - 09:00 PM (Sandhya Aarti)" class="slot-btn p-3 bg-slate-950 border border-slate-800 rounded-2xl text-left hover:border-amber-500 transition active:scale-95">
+                <span class="font-black text-xs text-white block">06:00 PM - 09:00 PM</span>
+                <span class="text-[10px] text-slate-400">Sandhya Aarti</span>
+              </button>
+            </div>
+          </div>
+
+          <button id="btn-proceed-to-pandits" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-3.5 rounded-2xl shadow-lg transition text-xs">
+            Continue to Choose Purohit & Rates &rarr;
+          </button>
+        </div>
+
+        <!-- STEP 3: SELECT PANDIT (PRICE APPEARS HERE ACCORDING TO PUROHIT) -->
+        <div id="booking-step-3" class="hidden space-y-4">
+          <div class="space-y-0.5">
+            <button id="btn-back-to-step-2" class="text-xs text-amber-400 font-bold mb-1"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest block">Step 3 of 4</span>
+            <h2 class="text-lg font-black text-white">Choose Purohit & Dakshina</h2>
+            <p class="text-xs text-slate-400">Dakshina is set directly by each verified Acharya.</p>
+          </div>
+
+          <div id="app-pandit-rates-list" class="space-y-3 overflow-y-auto max-h-[calc(100vh-270px)] no-scrollbar pb-6">
+            <!-- Dynamic Pandits with custom rates injected here -->
+          </div>
+        </div>
+
+        <!-- STEP 4: ADDRESS PIN, SANKALP & DYNAMIC PAYMENT -->
+        <div id="booking-step-4" class="hidden space-y-4 overflow-y-auto max-h-[calc(100vh-140px)] no-scrollbar pb-8">
+          <div class="space-y-0.5">
+            <button id="btn-back-to-step-3" class="text-xs text-amber-400 font-bold mb-1"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest block">Step 4 of 4</span>
+            <h2 class="text-lg font-black text-white">Puja Venue & Payment</h2>
+          </div>
+
+          <!-- Devotee & Venue Details -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3 text-xs">
+            <div>
+              <label class="font-bold text-slate-400">Devotee Gotra</label>
+              <input type="text" id="app-input-gotra" placeholder="e.g. Kashyap, Bharadwaj" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:ring-2 focus:ring-amber-500" />
+            </div>
+            <div>
+              <label class="font-bold text-slate-400">Family Members for Holy Sankalp</label>
+              <input type="text" id="app-input-family" placeholder="e.g. Amitabh, Ritu & Children" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:ring-2 focus:ring-amber-500" />
+            </div>
+            <div>
+              <label class="font-bold text-slate-400">Doorstep Address in Ranchi</label>
+              <input type="text" id="app-input-address" value="Harmu Housing Colony, Ranchi, Jharkhand" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:ring-2 focus:ring-amber-500" />
+            </div>
+          </div>
+
+          <!-- Price Receipt Summary -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2 text-xs">
+            <div class="flex justify-between text-slate-400">
+              <span id="receipt-pandit-label">Purohit Dakshina</span>
+              <span id="receipt-dakshina-val" class="font-bold text-white">₹3,100</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>Pure Samagri & Havan Kit</span>
+              <span id="receipt-samagri-val" class="font-bold text-white">₹850</span>
+            </div>
+            <div class="flex justify-between text-slate-400">
+              <span>Platform Care Fee</span>
+              <span class="font-bold text-white">₹150</span>
+            </div>
+            <div class="flex justify-between pt-2 border-t border-slate-800 text-sm font-black text-amber-400">
+              <span>Total Payable</span>
+              <span id="receipt-total-val">₹4,100</span>
+            </div>
+          </div>
+
+          <!-- Dynamic UPI Payment Card -->
+          <div class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl space-y-3">
+            <span class="text-[10px] font-black uppercase tracking-wider text-amber-400 block">Sansthan UPI Payment</span>
+            
+            <div id="app-qr-container" class="flex items-center gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800">
+              <img id="app-upi-qr" src="" alt="UPI QR" class="w-24 h-24 rounded-lg border border-slate-700" />
+              <div class="text-[11px] space-y-1">
+                <p class="font-bold text-white">Scan & Pay via GPay/PhonePe</p>
+                <p class="text-slate-400 font-mono text-[10px]" id="app-upi-id-label">vaidika.ranchi@okaxis</p>
+                <a id="btn-upi-intent" href="#" class="inline-block bg-emerald-600 text-white font-bold px-2.5 py-1 rounded text-[10px] mt-1">1-Tap Pay on Phone</a>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-[11px] font-bold text-slate-300">Enter Payment UTR / Transaction ID</label>
+              <input type="text" id="app-input-utr" placeholder="12-digit UTR (e.g. 429381048291)" class="w-full mt-1 bg-slate-900 border border-amber-500/40 rounded-xl p-2.5 text-xs text-white font-mono font-bold outline-none focus:ring-2 focus:ring-amber-500" />
+            </div>
+          </div>
+
+          <button id="btn-final-confirm-order" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-slate-950 font-black py-4 rounded-2xl shadow-xl transition text-xs flex items-center justify-center gap-2">
+            <i class="fa-solid fa-hands-praying"></i>
+            <span>Confirm & Place Holy Booking</span>
+          </button>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- ================= BOTTOM NAVIGATION ================= -->
+    <nav class="bg-slate-900 border-t border-slate-800 px-6 py-2.5 flex justify-around items-center shrink-0 z-30">
+      <button id="nav-btn-home" class="flex flex-col items-center space-y-0.5 text-amber-400 font-bold text-[10px]">
+        <i class="fa-solid fa-om text-base"></i>
+        <span>Book Puja</span>
+      </button>
+      <button id="nav-btn-status" class="flex flex-col items-center space-y-0.5 text-slate-400 hover:text-white font-bold text-[10px]">
+        <i class="fa-solid fa-radar text-base"></i>
+        <span>Live Status</span>
+      </button>
+      <a href="pandit.html" class="flex flex-col items-center space-y-0.5 text-slate-400 hover:text-white font-bold text-[10px]">
+        <i class="fa-solid fa-user-tie text-base"></i>
+        <span>Purohit Portal</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- AUTH MODAL -->
+  <div id="app-auth-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-xs w-full p-6 space-y-4 shadow-2xl relative">
+      <button id="btn-close-app-auth" class="absolute top-4 right-4 text-slate-400 text-xl font-bold">&times;</button>
+      <div class="text-center space-y-1">
+        <span class="text-3xl">🕉️</span>
+        <h3 class="font-black text-base text-white">Devotee Sign In</h3>
+        <p class="text-[11px] text-slate-400">Mobile + 4-Digit PIN for instant access</p>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-400">Devotee Full Name</label>
+          <input type="text" id="app-login-name" placeholder="e.g. Amitabh Verma" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white outline-none focus:ring-2 focus:ring-amber-500" />
+        </div>
+        <div>
+          <label class="font-bold text-slate-400">Mobile Number</label>
+          <input type="tel" id="app-login-phone" placeholder="9876543210" maxlength="10" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white font-mono font-bold outline-none focus:ring-2 focus:ring-amber-500" />
+        </div>
+        <div>
+          <label class="font-bold text-slate-400">4-Digit Security PIN</label>
+          <input type="password" id="app-login-pin" placeholder="••••" maxlength="4" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white font-mono font-black text-center text-base tracking-[0.3em] outline-none focus:ring-2 focus:ring-amber-500" />
+        </div>
+
+        <button id="btn-exec-login" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-3 rounded-xl shadow-lg transition">
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVOTEE LOGIC MODULE SCRIPT -->
+  <script type="module">
+    import {
+      db,
+      auth,
+      DEFAULT_SERVICES,
+      RANCHI_CENTER,
+      showToast,
+      showCustomModal,
+      getPlatformSettings,
+      collection,
+      doc,
+      setDoc,
+      getDoc,
+      addDoc,
+      onSnapshot,
+      query,
+      where,
+      GeoPoint,
+      serverTimestamp,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "./shared.js";
+
+    // Application State
+    let currentUser = null;
+    let activeBookingData = null;
+    let selectedPuja = null;
+    let selectedSlot = "09:00 AM - 12:00 PM (Pratah Kaal)";
+    let selectedDate = new Date().toISOString().split("T")[0];
+    let selectedPandit = null;
+    let platformSettings = null;
+    let liveTrackingMap = null;
+
+    // Set today's date in step 2
+    document.getElementById("booking-date").value = selectedDate;
+
+    // 1. Render Puja Catalog (STEP 1: NO PRICES SHOWN)
+    function renderPujasCatalog() {
+      const container = document.getElementById("app-puja-list");
+      container.innerHTML = "";
+
+      DEFAULT_SERVICES.forEach((s) => {
+        const card = document.createElement("div");
+        card.className = "bg-slate-950 p-4 rounded-2xl border border-slate-800 hover:border-amber-500/50 transition cursor-pointer active:scale-95 space-y-1.5 shadow-sm";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-sm border border-amber-500/20">
+                <i class="fa-solid ${s.icon}"></i>
+              </div>
+              <div>
+                <h3 class="font-black text-xs text-white">${s.name}</h3>
+                <span class="text-[10px] text-amber-400 font-bold">${s.hindiName}</span>
+              </div>
+            </div>
+            <span class="text-[10px] text-slate-400 font-bold"><i class="fa-solid fa-clock mr-1"></i>${s.duration}</span>
+          </div>
+          <p class="text-[11px] text-slate-400">${s.tagline}</p>
+        `;
+        card.onclick = () => {
+          selectedPuja = s;
+          document.getElementById("step2-puja-title").textContent = s.name;
+          switchBookingStep(2);
+        };
+        container.appendChild(card);
+      });
+    }
+
+    // Step Navigations
+    function switchBookingStep(stepNum) {
+      document.getElementById("booking-step-1").classList.toggle("hidden", stepNum !== 1);
+      document.getElementById("booking-step-2").classList.toggle("hidden", stepNum !== 2);
+      document.getElementById("booking-step-3").classList.toggle("hidden", stepNum !== 3);
+      document.getElementById("booking-step-4").classList.toggle("hidden", stepNum !== 4);
+    }
+
+    document.getElementById("btn-back-to-step-1").onclick = () => switchBookingStep(1);
+    document.getElementById("btn-back-to-step-2").onclick = () => switchBookingStep(2);
+    document.getElementById("btn-back-to-step-3").onclick = () => switchBookingStep(3);
+
+    // Step 2 Slot Selection
+    document.querySelectorAll(".slot-btn").forEach((btn) => {
+      btn.onclick = (e) => {
+        document.querySelectorAll(".slot-btn").forEach((b) => {
+          b.className = "slot-btn p-3 bg-slate-950 border border-slate-800 rounded-2xl text-left hover:border-amber-500 transition active:scale-95";
+        });
+        btn.className = "slot-btn p-3 bg-slate-950 border border-amber-500 bg-amber-500/10 rounded-2xl text-left transition active:scale-95";
+        selectedSlot = btn.getAttribute("data-slot");
+      };
+    });
+
+    document.getElementById("booking-date").onchange = (e) => {
+      selectedDate = e.target.value;
+    };
+
+    document.getElementById("btn-proceed-to-pandits").onclick = () => {
+      loadPanditsWithCustomRates();
+      switchBookingStep(3);
+    };
+
+    // STEP 3: Load Pandits showing their individual rates for selected puja
+    async function loadPanditsWithCustomRates() {
+      const container = document.getElementById("app-pandit-rates-list");
+      container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Finding available verified Purohits in Ranchi...</p>`;
+
+      const snap = await collection(db, "pandits");
+      onSnapshot(snap, (querySnap) => {
+        container.innerHTML = "";
+        const available = [];
+
+        querySnap.forEach((d) => {
+          const p = { id: d.id, ...d.data() };
+          if (p.isVerified !== false && p.status === "online") {
+            available.push(p);
+          }
+        });
+
+        if (available.length === 0) {
+          container.innerHTML = `
+            <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-center space-y-2">
+              <p class="text-xs text-slate-300 font-bold">Purohits currently standing by in Ranchi.</p>
+              <p class="text-[10px] text-slate-500">You can proceed with booking and our Sansthan Desk will assign an Acharya.</p>
+            </div>
+          `;
+          return;
+        }
+
+        available.forEach((p) => {
+          // Dynamic Dakshina from Pandit's custom rates
+          const dakshina = (p.customRates && p.customRates[selectedPuja.id]) ? p.customRates[selectedPuja.id] : 3100;
+
+          const card = document.createElement("div");
+          card.className = "bg-slate-950 p-4 rounded-2xl border border-slate-800 hover:border-amber-500 transition cursor-pointer active:scale-95 space-y-2 shadow-sm";
+          card.innerHTML = `
+            <div class="flex justify-between items-start">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-9 h-9 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">
+                  🕉️
+                </div>
+                <div>
+                  <h4 class="font-black text-xs text-white">${p.name}</h4>
+                  <p class="text-[10px] text-slate-400">${p.experienceYears || 12}+ Yrs Exp • ${p.languages?.join(", ") || "Hindi, Sanskrit"}</p>
+                </div>
+              </div>
+              <span class="bg-amber-500/10 text-amber-400 text-[10px] font-black px-2 py-0.5 rounded border border-amber-500/30">★ ${p.rating || "5.0"}</span>
+            </div>
+
+            <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
+              <span class="text-slate-400 font-bold">Purohit's Dakshina:</span>
+              <span class="font-black text-amber-400 text-sm">₹${dakshina.toLocaleString()}</span>
+            </div>
+          `;
+          card.onclick = () => {
+            selectedPandit = { ...p, calculatedDakshina: dakshina };
+            setupStep4Checkout(dakshina);
+            switchBookingStep(4);
+          };
+          container.appendChild(card);
+        });
+      });
+    }
+
+    // STEP 4: Setup Checkout
+    async function setupStep4Checkout(dakshina) {
+      if (!platformSettings) {
+        platformSettings = await getPlatformSettings();
+      }
+
+      const samagri = selectedPuja.samagriFee || 850;
+      const platformFee = 150;
+      const total = dakshina + samagri + platformFee;
+
+      document.getElementById("receipt-pandit-label").textContent = `${selectedPandit.name} Dakshina`;
+      document.getElementById("receipt-dakshina-val").textContent = `₹${dakshina.toLocaleString()}`;
+      document.getElementById("receipt-samagri-val").textContent = `₹${samagri.toLocaleString()}`;
+      document.getElementById("receipt-total-val").textContent = `₹${total.toLocaleString()}`;
+
+      // Setup UPI QR
+      const upiUri = `upi://pay?pa=${encodeURIComponent(platformSettings.upiId)}&pn=${encodeURIComponent(platformSettings.upiPayeeName)}&am=${total}&cu=INR&tn=Puja_${selectedPuja.id}`;
+      document.getElementById("app-upi-qr").src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiUri)}`;
+      document.getElementById("btn-upi-intent").href = upiUri;
+      document.getElementById("app-upi-id-label").textContent = platformSettings.upiId;
+    }
+
+    // SUBMIT FINAL BOOKING
+    document.getElementById("btn-final-confirm-order").onclick = async () => {
+      const utr = document.getElementById("app-input-utr").value.trim();
+      const address = document.getElementById("app-input-address").value.trim();
+      const gotra = document.getElementById("app-input-gotra").value.trim();
+      const family = document.getElementById("app-input-family").value.trim();
+
+      if (!currentUser) {
+        document.getElementById("app-auth-modal").classList.remove("hidden");
+        return;
+      }
+      if (!utr) {
+        showToast("Please enter your Payment UTR / Reference ID.", "error");
+        return;
+      }
+
+      const totalAmount = selectedPandit.calculatedDakshina + (selectedPuja.samagriFee || 850) + 150;
+
+      try {
+        const newBooking = await addDoc(collection(db, "bookings"), {
+          customerId: currentUser.uid,
+          customerName: currentUser.displayName || "Devotee",
+          customerPhone: currentUser.phoneNumber || "+91 9876543210",
+          serviceId: selectedPuja.id,
+          serviceName: selectedPuja.name,
+          scheduledDate: selectedDate,
+          scheduledSlot: selectedSlot,
+          address: address,
+          location: new GeoPoint(23.3533, 85.3021),
+          gotra: gotra || "Not Specified",
+          familyNames: family || "Family",
+          assignedPanditId: selectedPandit.id,
+          assignedPanditName: selectedPandit.name,
+          assignedPanditPhone: selectedPandit.phone || "+91 9123456780",
+          status: "pending_verification", // pending_verification -> confirmed -> departed -> arrived -> in_progress -> completed
+          paymentStatus: "submitted",
+          paymentUtr: utr,
+          pricing: {
+            dakshina: selectedPandit.calculatedDakshina,
+            samagriFee: selectedPuja.samagriFee || 850,
+            platformFee: 150,
+            totalAmount: totalAmount
+          },
+          createdAt: serverTimestamp()
+        });
+
+        showToast("Booking Submitted! Locked into Live Tracking screen.", "success");
+      } catch (err) {
+        showToast("Error: " + err.message, "error");
+      }
+    };
+
+    // ================= REAL-TIME IN-PROGRESS LOCK & TRACKING =================
+    function listenActiveBookingLock(uid) {
+      const q = query(
+        collection(db, "bookings"),
+        where("customerId", "==", uid)
+      );
+
+      onSnapshot(q, (snap) => {
+        let active = null;
+        snap.forEach((d) => {
+          const b = { id: d.id, ...d.data() };
+          if (b.status !== "completed" && b.status !== "cancelled") {
+            active = b;
+          }
+        });
+
+        activeBookingData = active;
+        const screenTracking = document.getElementById("screen-tracking");
+        const screenBooking = document.getElementById("screen-booking-flow");
+
+        if (active) {
+          // USER CANNOT BOOK ANOTHER PUJA WHILE ONE IS ACTIVE -> LOCKED TO TRACKING SCREEN
+          screenTracking.classList.remove("hidden");
+          screenBooking.classList.add("hidden");
+          renderTrackingScreen(active);
+        } else {
+          screenTracking.classList.add("hidden");
+          screenBooking.classList.remove("hidden");
+          switchBookingStep(1);
+        }
+      });
+    }
+
+    function renderTrackingScreen(b) {
+      document.getElementById("track-booking-id").textContent = `#BK-${b.id.slice(0, 6)}`;
+      document.getElementById("track-service-title").textContent = b.serviceName;
+      document.getElementById("track-slot-text").innerHTML = `<i class="fa-solid fa-calendar-clock mr-1"></i> ${b.scheduledDate || "Today"} • ${b.scheduledSlot || "Morning Slot"}`;
+      document.getElementById("track-pandit-name").textContent = b.assignedPanditName || "Purohit Assigned";
+      document.getElementById("btn-track-call-pandit").href = `tel:${b.assignedPanditPhone || '+919123456780'}`;
+      document.getElementById("track-address-text").textContent = b.address;
+
+      // Update Stepper UI
+      const steps = {
+        pay: document.getElementById("step-pay"),
+        assigned: document.getElementById("step-assigned"),
+        departed: document.getElementById("step-departed"),
+        arrived: document.getElementById("step-arrived"),
+        progress: document.getElementById("step-progress")
+      };
+
+      // Reset
+      Object.values(steps).forEach((el) => el.className = "flex items-center space-x-2.5 text-xs text-slate-500");
+
+      if (b.status === "pending_verification") {
+        steps.pay.className = "flex items-center space-x-2.5 text-xs text-amber-400 font-bold";
+      } else if (b.status === "confirmed") {
+        steps.pay.className = "flex items-center space-x-2.5 text-xs text-emerald-400";
+        steps.assigned.className = "flex items-center space-x-2.5 text-xs text-amber-400 font-bold";
+      } else if (b.status === "departed") {
+        steps.pay.className = steps.assigned.className = "flex items-center space-x-2.5 text-xs text-emerald-400";
+        steps.departed.className = "flex items-center space-x-2.5 text-xs text-amber-400 font-bold animate-pulse";
+      } else if (b.status === "arrived") {
+        steps.pay.className = steps.assigned.className = steps.departed.className = "flex items-center space-x-2.5 text-xs text-emerald-400";
+        steps.arrived.className = "flex items-center space-x-2.5 text-xs text-emerald-400 font-bold";
+      } else if (b.status === "in_progress") {
+        steps.pay.className = steps.assigned.className = steps.departed.className = steps.arrived.className = "flex items-center space-x-2.5 text-xs text-emerald-400";
+        steps.progress.className = "flex items-center space-x-2.5 text-xs text-amber-400 font-bold animate-pulse";
+      }
+
+      // Init Live Tracking Map
+      if (!liveTrackingMap) {
+        liveTrackingMap = L.map("track-live-map").setView([RANCHI_CENTER.lat, RANCHI_CENTER.lng], 13);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "&copy; OpenStreetMap"
+        }).addTo(liveTrackingMap);
+
+        L.marker([RANCHI_CENTER.lat, RANCHI_CENTER.lng]).addTo(liveTrackingMap).bindPopup("📍 Puja Venue");
+      }
+    }
+
+    // Bottom Navigation Handlers
+    document.getElementById("nav-btn-home").onclick = () => {
+      if (activeBookingData) {
+        showToast("You have a Puja currently in progress!", "info");
+      } else {
+        switchBookingStep(1);
+      }
+    };
+
+    document.getElementById("nav-btn-status").onclick = () => {
+      if (!activeBookingData) {
+        showToast("No active Puja in progress.", "info");
+      }
+    };
+
+    // ================= AUTHENTICATION HANDLERS =================
+    document.getElementById("btn-app-login").onclick = () => document.getElementById("app-auth-modal").classList.remove("hidden");
+    document.getElementById("btn-close-app-auth").onclick = () => document.getElementById("app-auth-modal").classList.add("hidden");
+
+    document.getElementById("btn-exec-login").onclick = async () => {
+      const name = document.getElementById("app-login-name").value.trim() || "Devotee";
+      const phone = document.getElementById("app-login-phone").value.trim();
+      const pin = document.getElementById("app-login-pin").value.trim();
+
+      if (!phone || phone.length < 10) {
+        showToast("Please enter a valid 10-digit mobile number.", "error");
+        return;
+      }
+      if (!pin || pin.length < 4) {
+        showToast("Please enter a 4-digit security PIN.", "error");
+        return;
+      }
+
+      const pseudoEmail = `devotee_${phone.slice(-10)}@vaidika.internal`;
+      const pseudoPass = `pin_${pin}_${phone.slice(-4)}`;
+
+      try {
+        const res = await signInWithEmailAndPassword(auth, pseudoEmail, pseudoPass);
+        await updateProfile(res.user, { displayName: name });
+        document.getElementById("app-auth-modal").classList.add("hidden");
+        showToast(`Welcome, ${name}!`, "success");
+      } catch (err) {
+        try {
+          const createRes = await createUserWithEmailAndPassword(auth, pseudoEmail, pseudoPass);
+          await updateProfile(createRes.user, { displayName: name });
+          await setDoc(doc(db, "users", createRes.user.uid), {
+            name,
+            phone: `+91${phone.slice(-10)}`,
+            role: "customer",
+            createdAt: serverTimestamp()
+          });
+          document.getElementById("app-auth-modal").classList.add("hidden");
+          showToast(`Account created! Welcome, ${name}!`, "success");
+        } catch (createErr) {
+          showToast(createErr.message, "error");
+        }
+      }
+    };
+
+    document.getElementById("btn-app-logout").onclick = () => signOut(auth);
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      const pill = document.getElementById("app-user-pill");
+      const loginBtn = document.getElementById("btn-app-login");
+
+      if (user) {
+        pill.classList.remove("hidden");
+        pill.classList.add("flex");
+        loginBtn.classList.add("hidden");
+        document.getElementById("app-user-name").textContent = user.displayName || user.email?.split("@")[0] || "Devotee";
+        listenActiveBookingLock(user.uid);
+      } else {
+        pill.classList.add("hidden");
+        loginBtn.classList.remove("hidden");
+      }
+    });
+
+    // Start App
+    renderPujasCatalog();
+  </script>
+</body>
+</html>
